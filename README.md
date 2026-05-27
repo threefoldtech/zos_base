@@ -1,4 +1,4 @@
-# Zero-OS Base ![Tests](https://github.com/threefoldtech/zosbase/workflows/Tests%20and%20Coverage/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/threefoldtech/zos)](https://goreportcard.com/report/github.com/threefoldtech/zos)
+# Zero-OS Base ![Tests](https://github.com/threefoldtech/zos_base/workflows/Tests%20and%20Coverage/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/threefoldtech/zos)](https://goreportcard.com/report/github.com/threefoldtech/zos)
 
 Zero-OS Base contains shared foundational packages and core libraries common to all Zero-OS variants. It abstracts hardware interfaces, networking primitives, and storage operations used across the Zero-OS family.
 
