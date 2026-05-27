@@ -4,7 +4,7 @@ Zero-OS Base contains shared foundational packages and core libraries common to 
 
 ## What this is
 
-This repository provides the shared building blocks that underpin Zero-OS, Zero-OS v4, and Zero-OS Light. Rather than duplicating low-level logic across each OS variant, zosbase centralizes hardware abstraction, common protocols, and reusable libraries. This ensures consistency, reduces maintenance burden, and makes it easier to evolve the operating system family as a whole.
+This repository provides the shared building blocks that underpin Zero-OS, Zero-OS v4, and Zero-OS Light. Rather than duplicating low-level logic across each OS variant, ZOS Base centralizes hardware abstraction, common protocols, and reusable libraries. This ensures consistency, reduces maintenance burden, and makes it easier to evolve the operating system family as a whole.
 
 ## What this repository contains
 
@@ -17,13 +17,13 @@ This repository provides the shared building blocks that underpin Zero-OS, Zero-
 
 ## Role in the stack
 
-Zosbase sits at the bottom of the Zero-OS software stack. It is imported and used by:
+ZOS Base sits at the bottom of the Zero-OS software stack. It is imported and used by:
 
-- **zos** — the main Zero-OS V2 node operating system
-- **zos4** — the next-generation Zero-OS V4
-- **zoslight** — the lightweight variant for edge and constrained devices
+- **ZOS** — the main Zero-OS V2 node operating system
+- **ZOS v4** — the next-generation Zero-OS V4
+- **ZOS Light** — the lightweight variant for edge and constrained devices
 
-Any improvement or fix in zosbase propagates to all dependent OS variants, making it the central point of reuse for the Zero-OS ecosystem.
+Any improvement or fix in ZOS Base propagates to all dependent OS variants, making it the central point of reuse for the Zero-OS ecosystem.
 
 ## ZOS / Zero-OS
 
