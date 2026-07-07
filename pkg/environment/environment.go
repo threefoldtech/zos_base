@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	baseExtendedURL = "https://raw.githubusercontent.com/threefoldtech/zos-config/main/"
+	baseExtendedURL = "https://raw.githubusercontent.com/threefoldtech/zos_config/main/"
 
 	defaultHubURL   = "https://hub.threefold.me"
 	defaultV4HubURL = "https://v4.hub.threefold.me"
