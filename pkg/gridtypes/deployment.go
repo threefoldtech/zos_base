@@ -129,8 +129,8 @@ func (d *Deployment) IsActive() bool {
 	active := false
 	for i := range d.Workloads {
 		wl := &d.Workloads[i]
-		if !wl.Result.State.IsAny(StateDeleted, StateError) {
-			// not delete or error so is probably active
+		if !wl.Result.State.IsAny(StateDeleted) {
+			// not deleted, so is active (includes StateError which needs retry)
 			return true
 		}
 	}

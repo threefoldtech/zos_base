@@ -15,6 +15,10 @@ type Provision interface {
 	// GetWorkloadStatus: returns status, bool(true if workload exits otherwise it is false), error
 	GetWorkloadStatus(id string) (gridtypes.ResultState, bool, error)
 	CreateOrUpdate(twin uint32, deployment gridtypes.Deployment, update bool) error
+	// SetWorkloadError updates workload state to error without decommissioning it
+	SetWorkloadError(id string, errorMsg string) error
+	// SetWorkloadOk updates workload state to ok without decommissioning it
+	SetWorkloadOk(id string) error
 	Get(twin uint32, contractID uint64) (gridtypes.Deployment, error)
 	List(twin uint32) ([]gridtypes.Deployment, error)
 	Changes(twin uint32, contractID uint64) ([]gridtypes.Workload, error)

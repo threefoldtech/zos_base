@@ -1025,6 +1025,72 @@ func (e *NativeEngine) DecommissionCached(id string, reason string) error {
 	return err
 }
 
+// SetWorkloadError updates workload state to error without decommissioning it
+func (e *NativeEngine) SetWorkloadError(id string, errorMsg string) error {
+	log.Info().Str("workload-id", id).Str("error", errorMsg).Msg("setting workload state to error")
+
+	globalID := gridtypes.WorkloadID(id)
+	twin, dlID, name, err := globalID.Parts()
+	if err != nil {
+		log.Error().Err(err).Str("workload-id", id).Msg("failed to parse workload ID")
+		return err
+	}
+	log.Debug().Uint32("twin", twin).Uint64("deployment", dlID).Str("name", string(name)).Msg("parsed workload ID")
+	wl, err := e.storage.Current(twin, dlID, name)
+	if err != nil {
+		log.Error().Err(err).Uint32("twin", twin).Uint64("deployment", dlID).Str("name", string(name)).Msg("failed to get workload from storage")
+		return err
+	}
+
+	if wl.Result.State == gridtypes.StateDeleted ||
+		wl.Result.State == gridtypes.StateError {
+		// nothing to do!
+		return nil
+	}
+
+	// Update result to StateError without uninstalling
+	result := gridtypes.Result{
+		Created: gridtypes.Now(),
+		State:   gridtypes.StateError,
+		Error:   errorMsg,
+	}
+
+	return e.storage.Transaction(twin, dlID, wl.WithResults(result))
+}
+
+// SetWorkloadOk updates workload state to ok without decommissioning it
+func (e *NativeEngine) SetWorkloadOk(id string) error {
+	log.Info().Str("workload-id", id).Msg("setting workload state to ok")
+
+	globalID := gridtypes.WorkloadID(id)
+	twin, dlID, name, err := globalID.Parts()
+	if err != nil {
+		log.Error().Err(err).Str("workload-id", id).Msg("failed to parse workload ID")
+		return err
+	}
+	log.Debug().Uint32("twin", twin).Uint64("deployment", dlID).Str("name", string(name)).Msg("parsed workload ID")
+	wl, err := e.storage.Current(twin, dlID, name)
+	if err != nil {
+		log.Error().Err(err).Uint32("twin", twin).Uint64("deployment", dlID).Str("name", string(name)).Msg("failed to get workload from storage")
+		return err
+	}
+
+	if wl.Result.State == gridtypes.StateDeleted ||
+		wl.Result.State == gridtypes.StateOk {
+		// nothing to do!
+		return nil
+	}
+
+	// Update result to StateOk without uninstalling
+	result := gridtypes.Result{
+		Created: gridtypes.Now(),
+		State:   gridtypes.StateOk,
+		Error:   "",
+	}
+
+	return e.storage.Transaction(twin, dlID, wl.WithResults(result))
+}
+
 func (n *NativeEngine) CreateOrUpdate(twin uint32, deployment gridtypes.Deployment, update bool) error {
 	if err := deployment.Valid(); err != nil {
 		return err

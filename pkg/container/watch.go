@@ -10,7 +10,6 @@ import (
 	"github.com/containerd/typeurl/v2"
 	"github.com/patrickmn/go-cache"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
 )
 
 func (c *Module) handlerEventTaskExit(ctx context.Context, ns string, event *events.TaskExit) {
@@ -55,17 +54,18 @@ func (c *Module) handlerEventTaskExit(ctx context.Context, ns string, event *eve
 		<-time.After(restartDelay) // wait for 2 seconds
 		reason = c.start(ns, event.ContainerID)
 	} else {
-		reason = fmt.Errorf("deleting container due to so many crashes")
+		reason = fmt.Errorf("restarting container failed due to so many crashes")
 	}
+	log.Debug().Err(reason).Msg("failed to restart container")
 
-	if reason != nil {
-		log.Debug().Err(reason).Msg("deleting container due to restart error")
+	// if reason != nil {
+	// 	log.Debug().Err(reason).Msg("deleting container due to restart error")
 
-		stub := stubs.NewProvisionStub(c.client)
-		if err := stub.DecommissionCached(ctx, event.ContainerID, reason.Error()); err != nil {
-			log.Error().Err(err).Msg("failed to decommission reservation")
-		}
-	}
+	// 	stub := stubs.NewProvisionStub(c.client)
+	// 	if err := stub.DecommissionCached(ctx, event.ContainerID, reason.Error()); err != nil {
+	// 		log.Error().Err(err).Msg("failed to decommission reservation")
+	// 	}
+	// }
 }
 
 func (c *Module) handleEvent(ctx context.Context, ns string, event interface{}) {
