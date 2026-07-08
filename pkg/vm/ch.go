@@ -16,9 +16,9 @@ import (
 	"github.com/cenkalti/backoff/v3"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/kernel"
-	"github.com/threefoldtech/zosbase/pkg/netlight/resource"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/netlight/resource"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/identity/store"
+	"github.com/threefoldtech/zos_base/pkg/identity/store"
 )
 
 const (

@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 	"github.com/yggdrasil-network/yggdrasil-go/src/address"
 )
 

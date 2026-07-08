@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/patrickmn/go-cache"
-	"github.com/threefoldtech/zosbase/pkg/geoip"
+	"github.com/threefoldtech/zos_base/pkg/geoip"
 )
 
 const (

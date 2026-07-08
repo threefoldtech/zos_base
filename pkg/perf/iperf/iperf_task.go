@@ -18,8 +18,8 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/perf"
-	execwrapper "github.com/threefoldtech/zosbase/pkg/perf/exec_wrapper"
+	"github.com/threefoldtech/zos_base/pkg/perf"
+	execwrapper "github.com/threefoldtech/zos_base/pkg/perf/exec_wrapper"
 )
 
 const (

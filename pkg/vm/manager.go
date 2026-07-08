@@ -16,11 +16,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/kernel"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
-	"github.com/threefoldtech/zosbase/pkg/vm/cloudinit"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/vm/cloudinit"
 )
 
 const (

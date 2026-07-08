@@ -12,9 +12,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/host"
 	substrate "github.com/threefoldtech/tfchain/clients/tfchain-client-go"
-	"github.com/threefoldtech/zosbase/pkg/app"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
-	"github.com/threefoldtech/zosbase/pkg/utils"
+	"github.com/threefoldtech/zos_base/pkg/app"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/utils"
 )
 
 const (

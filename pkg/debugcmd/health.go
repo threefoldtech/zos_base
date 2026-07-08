@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/threefoldtech/zosbase/pkg/debugcmd/checks"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/debugcmd/checks"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 type HealthRequest struct {

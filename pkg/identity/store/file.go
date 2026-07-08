@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg/versioned"
+	"github.com/threefoldtech/zos_base/pkg/versioned"
 	"github.com/tyler-smith/go-bip39"
 )
 

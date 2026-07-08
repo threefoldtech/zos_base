@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	gridtypes "github.com/threefoldtech/zosbase/pkg/gridtypes"
+	gridtypes "github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 // NetworkLight is the description of a part of a network local to a specific node.

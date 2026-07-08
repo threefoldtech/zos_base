@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg/mocks"
+	"github.com/threefoldtech/zos_base/pkg/mocks"
 	"go.uber.org/mock/gomock"
 )
 

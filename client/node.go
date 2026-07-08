@@ -5,10 +5,10 @@ import (
 	"net"
 
 	"github.com/threefoldtech/tfgrid-sdk-go/rmb-sdk-go"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/capacity/dmi"
-	"github.com/threefoldtech/zosbase/pkg/diagnostics"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/capacity/dmi"
+	"github.com/threefoldtech/zos_base/pkg/diagnostics"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 // NodeClient struct

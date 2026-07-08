@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	substrate "github.com/threefoldtech/tfchain/clients/tfchain-client-go"
-	"github.com/threefoldtech/zosbase/pkg/app"
+	"github.com/threefoldtech/zos_base/pkg/app"
 )
 
 type Urls struct {

@@ -9,8 +9,8 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/threefoldtech/zosbase/pkg/mocks"
-	"github.com/threefoldtech/zosbase/pkg/utils"
+	"github.com/threefoldtech/zos_base/pkg/mocks"
+	"github.com/threefoldtech/zos_base/pkg/utils"
 	"go.uber.org/mock/gomock"
 )
 

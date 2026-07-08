@@ -1,4 +1,4 @@
-module github.com/threefoldtech/zosbase
+module github.com/threefoldtech/zos_base
 
 go 1.25.0
 

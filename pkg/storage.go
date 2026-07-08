@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
 )
 
 //go:generate mkdir -p stubs
-//go:generate zbusc -module storage -version 0.0.1 -name storage -package stubs github.com/threefoldtech/zosbase/pkg+StorageModule stubs/storage_stub.go
+//go:generate zbusc -module storage -version 0.0.1 -name storage -package stubs github.com/threefoldtech/zos_base/pkg+StorageModule stubs/storage_stub.go
 
 // RaidProfile type
 

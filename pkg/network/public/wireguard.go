@@ -2,7 +2,7 @@ package public
 
 import (
 	"github.com/containernetworking/plugins/pkg/ns"
-	"github.com/threefoldtech/zosbase/pkg/netbase/wireguard"
+	"github.com/threefoldtech/zos_base/pkg/netbase/wireguard"
 	"github.com/vishvananda/netlink"
 )
 

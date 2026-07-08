@@ -6,7 +6,7 @@ import (
 
 	"github.com/jbenet/go-base58"
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg"
+	"github.com/threefoldtech/zos_base/pkg"
 	"golang.org/x/crypto/ed25519"
 )
 

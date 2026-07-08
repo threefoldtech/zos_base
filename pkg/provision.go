@@ -1,12 +1,12 @@
 package pkg
 
-//go:generate zbusc -module provision -version 0.0.1 -name provision -package stubs github.com/threefoldtech/zosbase/pkg+Provision stubs/provision_stub.go
-//go:generate zbusc -module provision -version 0.0.1 -name statistics -package stubs github.com/threefoldtech/zosbase/pkg+Statistics stubs/statistics_stub.go
+//go:generate zbusc -module provision -version 0.0.1 -name provision -package stubs github.com/threefoldtech/zos_base/pkg+Provision stubs/provision_stub.go
+//go:generate zbusc -module provision -version 0.0.1 -name statistics -package stubs github.com/threefoldtech/zos_base/pkg+Statistics stubs/statistics_stub.go
 
 import (
 	"context"
 
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 // Provision interface

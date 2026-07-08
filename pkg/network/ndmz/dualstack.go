@@ -11,25 +11,25 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v3"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/kernel"
-	"github.com/threefoldtech/zosbase/pkg/netbase/nft"
-	"github.com/threefoldtech/zosbase/pkg/network/bridge"
-	"github.com/threefoldtech/zosbase/pkg/network/dhcp"
-	"github.com/threefoldtech/zosbase/pkg/network/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/network/options"
-	"github.com/threefoldtech/zosbase/pkg/network/types"
-	"github.com/threefoldtech/zosbase/pkg/network/yggdrasil"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/netbase/nft"
+	"github.com/threefoldtech/zos_base/pkg/network/bridge"
+	"github.com/threefoldtech/zos_base/pkg/network/dhcp"
+	"github.com/threefoldtech/zos_base/pkg/network/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/network/options"
+	"github.com/threefoldtech/zos_base/pkg/network/types"
+	"github.com/threefoldtech/zos_base/pkg/network/yggdrasil"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 
-	"github.com/threefoldtech/zosbase/pkg/network/macvlan"
+	"github.com/threefoldtech/zos_base/pkg/network/macvlan"
 
 	"github.com/rs/zerolog/log"
 	"github.com/vishvananda/netlink"
 
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
 )
 
 const (

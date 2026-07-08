@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/app"
+	"github.com/threefoldtech/zos_base/pkg/app"
 )
 
 // Cleaner interface, implementer of this interface

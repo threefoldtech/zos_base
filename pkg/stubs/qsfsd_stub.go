@@ -7,8 +7,8 @@ package stubs
 import (
 	"context"
 	zbus "github.com/threefoldtech/zbus"
-	pkg "github.com/threefoldtech/zosbase/pkg"
-	zos "github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
+	pkg "github.com/threefoldtech/zos_base/pkg"
+	zos "github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
 )
 
 type QSFSDStub struct {

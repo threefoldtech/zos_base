@@ -3,13 +3,13 @@ package bootstrap
 import (
 	"fmt"
 
-	"github.com/threefoldtech/zosbase/pkg/netlight/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/netlight/options"
-	"github.com/threefoldtech/zosbase/pkg/netlight/types"
+	"github.com/threefoldtech/zos_base/pkg/netlight/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/netlight/options"
+	"github.com/threefoldtech/zos_base/pkg/netlight/types"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/netlight/bridge"
+	"github.com/threefoldtech/zos_base/pkg/netlight/bridge"
 	"github.com/vishvananda/netlink"
 )
 

@@ -3,7 +3,7 @@ package portm
 import (
 	"errors"
 
-	"github.com/threefoldtech/zosbase/pkg/network/portm/backend"
+	"github.com/threefoldtech/zos_base/pkg/network/portm/backend"
 )
 
 // ErrNoFreePort is returned when trying to reserve a port but all the

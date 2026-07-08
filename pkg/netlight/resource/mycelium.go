@@ -13,9 +13,9 @@ import (
 
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg/netbase/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/netlight/resource/peers"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/netbase/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/netlight/resource/peers"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 )
 
 const (

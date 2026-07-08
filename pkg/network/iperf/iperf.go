@@ -5,7 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 )
 
 const (

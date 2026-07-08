@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	substrate "github.com/threefoldtech/tfchain/clients/tfchain-client-go"
-	"github.com/threefoldtech/zosbase/pkg"
+	"github.com/threefoldtech/zos_base/pkg"
 
-	"github.com/threefoldtech/zosbase/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
 )
 
 const (

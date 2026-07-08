@@ -7,7 +7,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/showwin/speedtest-go/speedtest"
-	"github.com/threefoldtech/zosbase/pkg/perf"
+	"github.com/threefoldtech/zos_base/pkg/perf"
 )
 
 type SpeedTestTask struct {

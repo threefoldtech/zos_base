@@ -7,7 +7,7 @@ import (
 	substrate "github.com/threefoldtech/tfchain/clients/tfchain-client-go"
 )
 
-//go:generate zbusc -module api-gateway -version 0.0.1 -name api-gateway -package stubs github.com/threefoldtech/zosbase/pkg+SubstrateGateway stubs/api_gateway_stub.go
+//go:generate zbusc -module api-gateway -version 0.0.1 -name api-gateway -package stubs github.com/threefoldtech/zos_base/pkg+SubstrateGateway stubs/api_gateway_stub.go
 
 type SubstrateGateway interface {
 	UpdateSubstrateGatewayConnection(manager substrate.Manager) (err error)

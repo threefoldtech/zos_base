@@ -1,9 +1,9 @@
 package pkg
 
 //go:generate mkdir -p stubs
-//go:generate zbusc -module node -version 0.0.1 -name system -package stubs github.com/threefoldtech/zosbase/pkg+SystemMonitor stubs/system_monitor_stub.go
-//go:generate zbusc -module node -version 0.0.1 -name host -package stubs github.com/threefoldtech/zosbase/pkg+HostMonitor stubs/host_monitor_stub.go
-//go:generate zbusc -module identityd -version 0.0.1 -name monitor -package stubs github.com/threefoldtech/zosbase/pkg+VersionMonitor stubs/version_monitor_stub.go
+//go:generate zbusc -module node -version 0.0.1 -name system -package stubs github.com/threefoldtech/zos_base/pkg+SystemMonitor stubs/system_monitor_stub.go
+//go:generate zbusc -module node -version 0.0.1 -name host -package stubs github.com/threefoldtech/zos_base/pkg+HostMonitor stubs/host_monitor_stub.go
+//go:generate zbusc -module identityd -version 0.0.1 -name monitor -package stubs github.com/threefoldtech/zos_base/pkg+VersionMonitor stubs/version_monitor_stub.go
 
 import (
 	"context"

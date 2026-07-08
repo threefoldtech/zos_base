@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	graphql "github.com/threefoldtech/zosbase/pkg/perf/graphql"
+	graphql "github.com/threefoldtech/zos_base/pkg/perf/graphql"
 	gomock "go.uber.org/mock/gomock"
 )
 

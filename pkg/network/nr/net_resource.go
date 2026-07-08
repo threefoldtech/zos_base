@@ -15,14 +15,14 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v3"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
-	"github.com/threefoldtech/zosbase/pkg/network/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/network/macvlan"
-	"github.com/threefoldtech/zosbase/pkg/network/mycelium"
-	"github.com/threefoldtech/zosbase/pkg/network/ndmz"
-	"github.com/threefoldtech/zosbase/pkg/network/options"
-	"github.com/threefoldtech/zosbase/pkg/network/tuntap"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/network/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/network/macvlan"
+	"github.com/threefoldtech/zos_base/pkg/network/mycelium"
+	"github.com/threefoldtech/zos_base/pkg/network/ndmz"
+	"github.com/threefoldtech/zos_base/pkg/network/options"
+	"github.com/threefoldtech/zos_base/pkg/network/tuntap"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 
 	mapset "github.com/deckarep/golang-set"
 
@@ -30,14 +30,14 @@ import (
 
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/netbase/nft"
-	"github.com/threefoldtech/zosbase/pkg/netbase/wireguard"
-	"github.com/threefoldtech/zosbase/pkg/network/bridge"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/netbase/nft"
+	"github.com/threefoldtech/zos_base/pkg/netbase/wireguard"
+	"github.com/threefoldtech/zos_base/pkg/network/bridge"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
 	"github.com/vishvananda/netlink"
 
-	baseifaceutil "github.com/threefoldtech/zosbase/pkg/netbase/ifaceutil"
+	baseifaceutil "github.com/threefoldtech/zos_base/pkg/netbase/ifaceutil"
 )
 
 const (

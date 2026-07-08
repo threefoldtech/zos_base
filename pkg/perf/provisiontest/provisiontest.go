@@ -7,8 +7,8 @@ import (
 
 	"github.com/cenkalti/backoff"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/perf"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/perf"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 const (
