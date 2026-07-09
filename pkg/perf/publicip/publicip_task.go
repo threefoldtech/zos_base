@@ -14,12 +14,12 @@ import (
 	"github.com/pion/stun"
 	"github.com/rs/zerolog/log"
 	substrate "github.com/threefoldtech/tfchain/clients/tfchain-client-go"
-	"github.com/threefoldtech/zosbase/pkg/environment"
-	"github.com/threefoldtech/zosbase/pkg/network/macvlan"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
-	"github.com/threefoldtech/zosbase/pkg/perf"
-	"github.com/threefoldtech/zosbase/pkg/perf/graphql"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/environment"
+	"github.com/threefoldtech/zos_base/pkg/network/macvlan"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/perf"
+	"github.com/threefoldtech/zos_base/pkg/perf/graphql"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 	"github.com/vishvananda/netlink"
 )
 

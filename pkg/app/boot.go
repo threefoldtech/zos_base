@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg"
+	"github.com/threefoldtech/zos_base/pkg"
 )
 
 // defaultBootedPath is the path where to store the booted flag

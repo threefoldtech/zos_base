@@ -3,7 +3,7 @@ package zosapi
 import (
 	"context"
 
-	"github.com/threefoldtech/zosbase/pkg/debugcmd"
+	"github.com/threefoldtech/zos_base/pkg/debugcmd"
 )
 
 func (g *ZosAPI) debugDeploymentListHandler(ctx context.Context, payload []byte) (interface{}, error) {

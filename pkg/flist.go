@@ -1,10 +1,10 @@
 package pkg
 
-import "github.com/threefoldtech/zosbase/pkg/gridtypes"
+import "github.com/threefoldtech/zos_base/pkg/gridtypes"
 
 //go:generate mkdir -p stubs
 
-//go:generate zbusc -module flist -version 0.0.1 -name flist -package stubs github.com/threefoldtech/zosbase/pkg+Flister stubs/flist_stub.go
+//go:generate zbusc -module flist -version 0.0.1 -name flist -package stubs github.com/threefoldtech/zos_base/pkg+Flister stubs/flist_stub.go
 
 var (
 	//DefaultMountOptions has sane values for mount

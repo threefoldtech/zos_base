@@ -12,9 +12,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg/perf"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/perf"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 )
 
 const acceptableSkew = 10 * time.Minute

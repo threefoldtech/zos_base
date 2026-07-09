@@ -7,10 +7,10 @@ import (
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/network/dhcp"
-	"github.com/threefoldtech/zosbase/pkg/network/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg/network/dhcp"
+	"github.com/threefoldtech/zos_base/pkg/network/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 	"github.com/vishvananda/netlink"
 )
 

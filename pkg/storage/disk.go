@@ -12,8 +12,8 @@ import (
 	"github.com/g0rbe/go-chattr"
 	"github.com/pkg/errors"
 	log "github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 const (

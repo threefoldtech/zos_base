@@ -9,10 +9,10 @@ import (
 	"github.com/rs/zerolog/log"
 	substrate "github.com/threefoldtech/tfchain/clients/tfchain-client-go"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg/capacity"
-	"github.com/threefoldtech/zosbase/pkg/diagnostics"
-	"github.com/threefoldtech/zosbase/pkg/environment"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/capacity"
+	"github.com/threefoldtech/zos_base/pkg/diagnostics"
+	"github.com/threefoldtech/zos_base/pkg/environment"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 const (

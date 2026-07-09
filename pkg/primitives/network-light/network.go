@@ -8,10 +8,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/threefoldtech/zbus"
-	gridtypes "github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
-	provision "github.com/threefoldtech/zosbase/pkg/provision"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	gridtypes "github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
+	provision "github.com/threefoldtech/zos_base/pkg/provision"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 var (

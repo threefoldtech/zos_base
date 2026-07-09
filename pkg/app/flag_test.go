@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/threefoldtech/zosbase/pkg"
+	"github.com/threefoldtech/zos_base/pkg"
 )
 
 // TestSetFlag tests the setFlag function against multiple scenarios.

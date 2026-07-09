@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	gridtypes "github.com/threefoldtech/zosbase/pkg/gridtypes"
+	gridtypes "github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 func TestParseIPNet(t *testing.T) {

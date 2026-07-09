@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 func TestBuildResult(t *testing.T) {

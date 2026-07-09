@@ -10,10 +10,10 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
-	"github.com/threefoldtech/zosbase/pkg/kernel"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 var _ pkg.SystemMonitor = (*systemMonitor)(nil)

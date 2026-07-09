@@ -8,7 +8,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
 )
 
 // nolint

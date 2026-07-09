@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/threefoldtech/tfgrid-sdk-go/rmb-sdk-go/peer"
 
-	"github.com/threefoldtech/zosbase/pkg/environment"
+	"github.com/threefoldtech/zos_base/pkg/environment"
 )
 
 func (g *ZosAPI) authorized(ctx context.Context, _ []byte) (context.Context, error) {

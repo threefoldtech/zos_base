@@ -11,12 +11,12 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
-	"github.com/threefoldtech/zosbase/pkg/network/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/primitives/pubip"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/network/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/primitives/pubip"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 var networkResourceNet = net.IPNet{

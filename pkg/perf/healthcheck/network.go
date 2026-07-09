@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/app"
-	"github.com/threefoldtech/zosbase/pkg/environment"
+	"github.com/threefoldtech/zos_base/pkg/app"
+	"github.com/threefoldtech/zos_base/pkg/environment"
 )
 
 const defaultRequestTimeout = 10 * time.Second

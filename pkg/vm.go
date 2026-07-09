@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 
 	"github.com/shirou/gopsutil/cpu"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
 )
 
-//go:generate zbusc -module vmd -version 0.0.1 -name manager -package stubs github.com/threefoldtech/zosbase/pkg+VMModule stubs/vmd_stub.go
+//go:generate zbusc -module vmd -version 0.0.1 -name manager -package stubs github.com/threefoldtech/zos_base/pkg+VMModule stubs/vmd_stub.go
 
 // Route structure
 type Route struct {

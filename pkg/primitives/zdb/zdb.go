@@ -14,18 +14,18 @@ import (
 
 	"github.com/cenkalti/backoff/v3"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg/environment"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
-	"github.com/threefoldtech/zosbase/pkg/kernel"
-	"github.com/threefoldtech/zosbase/pkg/provision"
-	"github.com/threefoldtech/zosbase/pkg/zdb"
+	"github.com/threefoldtech/zos_base/pkg/environment"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/kernel"
+	"github.com/threefoldtech/zos_base/pkg/provision"
+	"github.com/threefoldtech/zos_base/pkg/zdb"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg"
-	nwmod "github.com/threefoldtech/zosbase/pkg/network"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg"
+	nwmod "github.com/threefoldtech/zos_base/pkg/network"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 const (

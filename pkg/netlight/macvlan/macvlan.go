@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/netlight/options"
+	"github.com/threefoldtech/zos_base/pkg/netlight/options"
 
 	"github.com/containernetworking/plugins/pkg/ip"
 	"github.com/containernetworking/plugins/pkg/ns"

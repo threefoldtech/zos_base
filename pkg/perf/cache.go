@@ -7,7 +7,7 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg"
+	"github.com/threefoldtech/zos_base/pkg"
 )
 
 const (

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog"
-	"github.com/threefoldtech/zosbase/pkg"
+	"github.com/threefoldtech/zos_base/pkg"
 )
 
 func logInterfaceDetails(logEvent *zerolog.Event, interfaces []Interface, networkInfo *pkg.VMNetworkInfo) *zerolog.Event {

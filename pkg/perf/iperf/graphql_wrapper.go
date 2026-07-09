@@ -3,7 +3,7 @@ package iperf
 import (
 	"context"
 
-	"github.com/threefoldtech/zosbase/pkg/perf/graphql"
+	"github.com/threefoldtech/zos_base/pkg/perf/graphql"
 )
 
 // GraphQLClient interface for mocking GraphQL operations

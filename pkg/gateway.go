@@ -1,10 +1,10 @@
 package pkg
 
-import "github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
+import "github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
 
 //go:generate mkdir -p stubs
 
-//go:generate zbusc -module gateway -version 0.0.1 -name manager -package stubs github.com/threefoldtech/zosbase/pkg+Gateway stubs/gateway_stub.go
+//go:generate zbusc -module gateway -version 0.0.1 -name manager -package stubs github.com/threefoldtech/zos_base/pkg+Gateway stubs/gateway_stub.go
 
 type GatewayMetrics struct {
 	Request  map[string]float64

@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 
 	cnins "github.com/containernetworking/plugins/pkg/ns"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
-	"github.com/threefoldtech/zosbase/pkg/network/nr"
-	"github.com/threefoldtech/zosbase/pkg/versioned"
-	"github.com/threefoldtech/zosbase/pkg/zinit"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/network/nr"
+	"github.com/threefoldtech/zos_base/pkg/versioned"
+	"github.com/threefoldtech/zos_base/pkg/zinit"
 	"github.com/vishvananda/netlink"
 )
 

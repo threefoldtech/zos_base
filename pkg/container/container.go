@@ -30,9 +30,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/patrickmn/go-cache"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg"
-	"github.com/threefoldtech/zosbase/pkg/container/logger"
-	"github.com/threefoldtech/zosbase/pkg/container/stats"
+	"github.com/threefoldtech/zos_base/pkg"
+	"github.com/threefoldtech/zos_base/pkg/container/logger"
+	"github.com/threefoldtech/zos_base/pkg/container/stats"
 
 	"github.com/containerd/containerd/cio"
 )

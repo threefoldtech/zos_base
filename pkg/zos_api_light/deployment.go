@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/threefoldtech/tfgrid-sdk-go/rmb-sdk-go/peer"
-	gridtypes "github.com/threefoldtech/zosbase/pkg/gridtypes"
+	gridtypes "github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 func (g *ZosAPI) deploymentDeployHandler(ctx context.Context, payload []byte) (interface{}, error) {

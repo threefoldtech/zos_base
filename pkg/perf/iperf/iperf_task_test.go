@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	execwrapper "github.com/threefoldtech/zosbase/pkg/perf/exec_wrapper"
+	execwrapper "github.com/threefoldtech/zos_base/pkg/perf/exec_wrapper"
 	"go.uber.org/mock/gomock"
 )
 

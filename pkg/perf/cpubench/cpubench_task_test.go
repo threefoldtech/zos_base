@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/threefoldtech/zbus"
-	"github.com/threefoldtech/zosbase/pkg/mocks"
-	"github.com/threefoldtech/zosbase/pkg/perf"
-	execwrapper "github.com/threefoldtech/zosbase/pkg/perf/exec_wrapper"
+	"github.com/threefoldtech/zos_base/pkg/mocks"
+	"github.com/threefoldtech/zos_base/pkg/perf"
+	execwrapper "github.com/threefoldtech/zos_base/pkg/perf/exec_wrapper"
 	"go.uber.org/mock/gomock"
 )
 

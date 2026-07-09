@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/containernetworking/plugins/pkg/ns"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
 	"github.com/vishvananda/netlink"
 )
 

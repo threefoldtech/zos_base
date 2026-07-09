@@ -1,13 +1,13 @@
 package pkg
 
 //go:generate mkdir -p stubs
-//go:generate zbusc -module container -version 0.0.1 -name container -package stubs github.com/threefoldtech/zosbase/pkg+ContainerModule stubs/container_stub.go
+//go:generate zbusc -module container -version 0.0.1 -name container -package stubs github.com/threefoldtech/zos_base/pkg+ContainerModule stubs/container_stub.go
 
 import (
 	"time"
 
-	"github.com/threefoldtech/zosbase/pkg/container/logger"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/container/logger"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 const (

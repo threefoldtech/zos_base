@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
 )
 
 const (

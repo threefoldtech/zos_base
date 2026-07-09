@@ -9,7 +9,7 @@ import (
 
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 
-	"github.com/threefoldtech/zosbase/pkg/crypto"
+	"github.com/threefoldtech/zos_base/pkg/crypto"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

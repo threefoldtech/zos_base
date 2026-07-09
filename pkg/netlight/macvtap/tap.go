@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/pkg/errors"
-	"github.com/threefoldtech/zosbase/pkg/netlight/options"
+	"github.com/threefoldtech/zos_base/pkg/netlight/options"
 	"github.com/vishvananda/netlink"
 )
 

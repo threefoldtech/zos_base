@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/threefoldtech/zosbase/pkg/perf"
-	execwrapper "github.com/threefoldtech/zosbase/pkg/perf/exec_wrapper"
-	"github.com/threefoldtech/zosbase/pkg/stubs"
+	"github.com/threefoldtech/zos_base/pkg/perf"
+	execwrapper "github.com/threefoldtech/zos_base/pkg/perf/exec_wrapper"
+	"github.com/threefoldtech/zos_base/pkg/stubs"
 )
 
 // CPUBenchmarkTask defines CPU benchmark task.

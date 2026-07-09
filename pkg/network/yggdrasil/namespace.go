@@ -8,11 +8,11 @@ import (
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/network/bridge"
-	"github.com/threefoldtech/zosbase/pkg/network/ifaceutil"
-	"github.com/threefoldtech/zosbase/pkg/network/macvlan"
-	"github.com/threefoldtech/zosbase/pkg/network/namespace"
-	"github.com/threefoldtech/zosbase/pkg/network/types"
+	"github.com/threefoldtech/zos_base/pkg/network/bridge"
+	"github.com/threefoldtech/zos_base/pkg/network/ifaceutil"
+	"github.com/threefoldtech/zos_base/pkg/network/macvlan"
+	"github.com/threefoldtech/zos_base/pkg/network/namespace"
+	"github.com/threefoldtech/zos_base/pkg/network/types"
 	"github.com/vishvananda/netlink"
 )
 

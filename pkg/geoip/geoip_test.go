@@ -6,7 +6,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
-	"github.com/threefoldtech/zosbase/pkg/environment"
+	"github.com/threefoldtech/zos_base/pkg/environment"
 )
 
 func TestGetLocation(t *testing.T) {

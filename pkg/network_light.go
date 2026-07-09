@@ -4,12 +4,12 @@ import (
 	"context"
 	"net"
 
-	"github.com/threefoldtech/zosbase/pkg/gridtypes"
-	"github.com/threefoldtech/zosbase/pkg/gridtypes/zos"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes"
+	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
 )
 
 //go:generate mkdir -p stubs
-//go:generate zbusc -module netlight -version 0.0.1 -name netlight -package stubs github.com/threefoldtech/zosbase/pkg+NetworkerLight stubs/network_light_stub.go
+//go:generate zbusc -module netlight -version 0.0.1 -name netlight -package stubs github.com/threefoldtech/zos_base/pkg+NetworkerLight stubs/network_light_stub.go
 
 // NetworkerLight is the interface for the network light module
 type NetworkerLight interface {

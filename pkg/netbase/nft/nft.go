@@ -10,7 +10,7 @@ import (
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"github.com/threefoldtech/zosbase/pkg/netlight/namespace"
+	"github.com/threefoldtech/zos_base/pkg/netlight/namespace"
 	"github.com/vishvananda/netlink"
 )
 
