@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/threefoldtech/tfchain/clients/tfchain-client-go v0.0.0-20250929084418-b950278ead30
-	github.com/threefoldtech/tfgrid-sdk-go/rmb-sdk-go v0.17.5
+	github.com/threefoldtech/zos_sdk_go/rmb-sdk-go v0.18.0
 	github.com/threefoldtech/zos_base v0.1.0
 )
 
