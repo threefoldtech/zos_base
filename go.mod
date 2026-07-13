@@ -31,7 +31,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gtank/merlin v0.1.1
-	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d
 	github.com/hasura/go-graphql-client v0.10.0
 	github.com/jbenet/go-base58 v0.0.0-20150317085156-6237cf65f3a6
 	github.com/joncrlsn/dque v0.0.0-20200702023911-3e80e3146ce5
@@ -47,8 +46,8 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/threefoldtech/0-fs v1.3.1-0.20240424140157-b488dfedcc56
 	github.com/threefoldtech/tfchain/clients/tfchain-client-go v0.0.0-20260302124210-526158ffbc00
-	github.com/threefoldtech/tfgrid-sdk-go/rmb-sdk-go v0.17.6
 	github.com/threefoldtech/zbus v1.0.1
+	github.com/threefoldtech/zos_sdk_go/rmb-sdk-go v0.18.0
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/vishvananda/netlink v1.2.1-beta.2
 	github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f
@@ -79,6 +78,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/signal v0.7.0 // indirect
 	github.com/moby/sys/user v0.3.0 // indirect
