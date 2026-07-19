@@ -14,6 +14,8 @@ var (
 		"redis": {},
 		"ws":    {},
 		"wss":   {},
+		"http":  {},
+		"https": {},
 	}
 )
 
