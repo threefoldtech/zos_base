@@ -281,13 +281,6 @@ func (u *Upgrader) update(ctx context.Context) error {
 		return errors.Wrap(err, "failed to get remote tag")
 	}
 
-	// obviously a remote tag need to match the current tag.
-	// if the remote is different, we actually run the update and exit.
-	if remote.Target == current.Target {
-		// nothing to do!
-		return nil
-	}
-
 	env := environment.MustGet()
 	gw := stubs.NewSubstrateGatewayStub(u.zcl)
 	chainVer, testFarms, err := getRolloutConfig(ctx, gw)
@@ -295,25 +288,36 @@ func (u *Upgrader) update(ctx context.Context) error {
 		return errors.Wrap(err, "failed to get rollout config and version")
 	}
 
-	remoteVer := remote.Target[strings.LastIndex(remote.Target, "/")+1:]
+	// the version the chain wants this node to run
+	targetVer := chainVer.Version
 	if kernel.GetParams().IsLight() {
-		if env.RunningMode != environment.RunningDev && (remoteVer != chainVer.VersionLight) {
-			// nothing to do! hub version is not the same as the chain
-			return nil
-		}
-	} else {
-		if env.RunningMode != environment.RunningDev && (remoteVer != chainVer.Version) {
-			// nothing to do! hub version is not the same as the chain
-			return nil
-		}
+		targetVer = chainVer.VersionLight
 	}
 
-	if !chainVer.SafeToUpgrade {
-		if !slices.Contains(testFarms, uint32(env.FarmID)) {
-			// nothing to do! waiting for the flag `safe to upgrade to be enabled after A/B testing`
-			// node is not a part of A/B testing
-			return nil
-		}
+	// During a canary rollout (safe_to_upgrade == false) the update worker holds the
+	// network `latest` taglink back at the last GA version, so a freshly bootstrapped
+	// node comes up on GA and non-canary nodes stay put. Only nodes whose farm is in
+	// test_farms take part, and they must target the chain (canary) version directly
+	// because `latest` no longer points at it.
+	if !chainVer.SafeToUpgrade && slices.Contains(testFarms, uint32(env.FarmID)) {
+		// retarget the taglink at the chain version, keeping the repo/tags prefix
+		prefix := remote.Target[:strings.LastIndex(remote.Target, "/")+1]
+		remote.Target = prefix + targetVer
+	}
+
+	// obviously a remote tag needs to differ from the current tag.
+	// if the remote is different, we actually run the update and exit.
+	if remote.Target == current.Target {
+		// nothing to do!
+		return nil
+	}
+
+	// the resolved hub version must match the version the chain wants us to run; for a
+	// non-canary node during a canary this keeps it from moving ahead of the GA `latest`.
+	remoteVer := remote.Target[strings.LastIndex(remote.Target, "/")+1:]
+	if env.RunningMode != environment.RunningDev && remoteVer != targetVer {
+		// nothing to do! `latest` hasn't caught up to the chain version yet
+		return nil
 	}
 
 	log.Info().Str("running version", u.Version().String()).Str("updating to version", filepath.Base(remote.Target)).Msg("updating system...")
