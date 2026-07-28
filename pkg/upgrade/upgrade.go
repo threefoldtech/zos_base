@@ -294,12 +294,18 @@ func (u *Upgrader) update(ctx context.Context) error {
 		targetVer = chainVer.VersionLight
 	}
 
+	isDev := env.RunningMode == environment.RunningDev
+
 	// During a canary rollout (safe_to_upgrade == false) the update worker holds the
 	// network `latest` taglink back at the last GA version, so a freshly bootstrapped
 	// node comes up on GA and non-canary nodes stay put. Only nodes whose farm is in
-	// test_farms take part, and they must target the chain (canary) version directly
+	// test_farms take part, and they must target the chain (canary) version tag directly
 	// because `latest` no longer points at it.
-	if !chainVer.SafeToUpgrade && slices.Contains(testFarms, uint32(env.FarmID)) {
+	//
+	// dev is not part of canary rollouts: dev envs are updated when code is merged to
+	// main, so a dev node just follows its network `latest` symlink unconditionally (no
+	// safe_to_upgrade / test_farms gating, and the version-match check below is skipped).
+	if !isDev && !chainVer.SafeToUpgrade && slices.Contains(testFarms, uint32(env.FarmID)) {
 		// retarget the taglink at the chain version, keeping the repo/tags prefix
 		prefix := remote.Target[:strings.LastIndex(remote.Target, "/")+1]
 		remote.Target = prefix + targetVer
@@ -314,8 +320,9 @@ func (u *Upgrader) update(ctx context.Context) error {
 
 	// the resolved hub version must match the version the chain wants us to run; for a
 	// non-canary node during a canary this keeps it from moving ahead of the GA `latest`.
+	// dev skips this check so it always follows `latest`.
 	remoteVer := remote.Target[strings.LastIndex(remote.Target, "/")+1:]
-	if env.RunningMode != environment.RunningDev && remoteVer != targetVer {
+	if !isDev && remoteVer != targetVer {
 		// nothing to do! `latest` hasn't caught up to the chain version yet
 		return nil
 	}
