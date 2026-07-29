@@ -46,6 +46,7 @@ func NewZosAPI(manager substrate.Manager, client zbus.Client, msgBrokerCon strin
 		return ZosAPI{}, err
 	}
 	storageModuleStub := stubs.NewStorageModuleStub(client)
+
 	api := ZosAPI{
 		oracle:                 capacity.NewResourceOracle(storageModuleStub),
 		versionMonitorStub:     stubs.NewVersionMonitorStub(client),

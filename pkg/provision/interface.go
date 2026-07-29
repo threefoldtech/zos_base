@@ -110,6 +110,19 @@ type StorageCapacity struct {
 // and or workload that returns true from the capacity calculation.
 type Exclude = func(dl *gridtypes.Deployment, wl *gridtypes.Workload) bool
 
+// QueryOpt is a functional option for Storage query methods
+type QueryOpt func(*QueryOpts)
+
+// QueryOpts holds query options for Storage methods
+type QueryOpts struct {
+	Deleted bool
+}
+
+// WithDeleted returns a QueryOpt that includes soft-deleted items in query results
+func WithDeleted() QueryOpt {
+	return func(o *QueryOpts) { o.Deleted = true }
+}
+
 // Storage interface
 type Storage interface {
 	// Create a new deployment in storage, it sets the initial transactions
@@ -120,7 +133,7 @@ type Storage interface {
 	// Delete deletes a deployment from storage.
 	Delete(twin uint32, deployment uint64) error
 	// Get gets the current state of a deployment from storage
-	Get(twin uint32, deployment uint64) (gridtypes.Deployment, error)
+	Get(twin uint32, deployment uint64, opts ...QueryOpt) (gridtypes.Deployment, error)
 	// Error sets global deployment error
 	Error(twin uint32, deployment uint64, err error) error
 	// Add workload to deployment, if no active deployment exists with same name
@@ -132,11 +145,11 @@ type Storage interface {
 	// Changes return all the historic transactions of a deployment
 	Changes(twin uint32, deployment uint64) (changes []gridtypes.Workload, err error)
 	// Current gets last state of a workload by name
-	Current(twin uint32, deployment uint64, name gridtypes.Name) (gridtypes.Workload, error)
+	Current(twin uint32, deployment uint64, name gridtypes.Name, opts ...QueryOpt) (gridtypes.Workload, error)
 	// Twins list twins in storage
-	Twins() ([]uint32, error)
+	Twins(opts ...QueryOpt) ([]uint32, error)
 	// ByTwin return list of deployments for a twin
-	ByTwin(twin uint32) ([]uint64, error)
+	ByTwin(twin uint32, opts ...QueryOpt) ([]uint64, error)
 	// return total capacity and active deployments
 	Capacity(exclude ...Exclude) (StorageCapacity, error)
 }

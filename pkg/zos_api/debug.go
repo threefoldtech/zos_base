@@ -48,8 +48,8 @@ func (g *ZosAPI) debugDeploymentHealthHandler(ctx context.Context, payload []byt
 
 func (g *ZosAPI) debugDeps() debugcmd.Deps {
 	return debugcmd.Deps{
-		Provision: g.provisionStub,
-		VM:        g.vmStub,
-		Network:   g.networkerStub,
+		VM:      g.vmStub,
+		Network: g.networkerStub,
+		Storage: g.provisionStub,
 	}
 }

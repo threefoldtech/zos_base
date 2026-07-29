@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 
@@ -25,6 +24,8 @@ const (
 	keyWorkloads            = "workloads"
 	keyTransactions         = "transactions"
 	keyGlobal               = "global"
+	keyDeletedAt            = "deleted_at"    // For deployment soft-delete
+	keyTwinMetadata         = "twin_metadata" // For twin-level metadata
 )
 
 type MigrationStorage struct {
@@ -49,29 +50,20 @@ func New(path string) (*BoltStorage, error) {
 	}, nil
 }
 
+func NewReadOnly(path string) (*BoltStorage, error) {
+	db, err := bolt.Open(path, 0644, &bolt.Options{ReadOnly: true})
+	if err != nil {
+		return nil, err
+	}
+
+	return &BoltStorage{
+		db, false,
+	}, nil
+}
+
 func (b BoltStorage) Migration() MigrationStorage {
 	b.unsafe = true
 	return MigrationStorage{unsafe: b}
-}
-
-func (b *BoltStorage) u32(u uint32) []byte {
-	var v [4]byte
-	binary.BigEndian.PutUint32(v[:], u)
-	return v[:]
-}
-
-func (b *BoltStorage) l32(v []byte) uint32 {
-	return binary.BigEndian.Uint32(v)
-}
-
-func (b *BoltStorage) u64(u uint64) []byte {
-	var v [8]byte
-	binary.BigEndian.PutUint64(v[:], u)
-	return v[:]
-}
-
-func (b *BoltStorage) l64(v []byte) uint64 {
-	return binary.BigEndian.Uint64(v)
 }
 
 func (b *BoltStorage) Create(deployment gridtypes.Deployment) error {
@@ -80,6 +72,14 @@ func (b *BoltStorage) Create(deployment gridtypes.Deployment) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to create twin")
 		}
+
+		// If twin was soft-deleted, revive it by clearing the deletion flag
+		if b.isTwinBucketDeleted(twin) {
+			if err := twin.DeleteBucket([]byte(keyTwinMetadata)); err != nil && !errors.Is(err, bolt.ErrBucketNotFound) {
+				return errors.Wrap(err, "failed to revive twin")
+			}
+		}
+
 		dl, err := twin.CreateBucket(b.u64(deployment.ContractID))
 		if errors.Is(err, bolt.ErrBucketExists) {
 			return provision.ErrDeploymentExists
@@ -183,42 +183,71 @@ func (b *MigrationStorage) Migrate(dl gridtypes.Deployment) error {
 
 func (b *BoltStorage) Delete(twin uint32, deployment uint64) error {
 	return b.db.Update(func(t *bolt.Tx) error {
-		bucket := t.Bucket(b.u32(twin))
-		if bucket == nil {
+		twinBucket := t.Bucket(b.u32(twin))
+		if twinBucket == nil {
 			return nil
 		}
 
-		if err := bucket.DeleteBucket(b.u64(deployment)); err != nil && !errors.Is(err, bolt.ErrBucketNotFound) {
+		deploymentBucket := twinBucket.Bucket(b.u64(deployment))
+		if deploymentBucket == nil {
+			return nil
+		}
+
+		// Soft-delete: Set deleted_at timestamp instead of deleting bucket
+		now := b.u64(uint64(gridtypes.Now()))
+		if err := deploymentBucket.Put([]byte(keyDeletedAt), now); err != nil {
 			return err
 		}
-		// if the twin now is empty then we can also delete the twin
-		curser := bucket.Cursor()
-		found := false
-		for k, v := curser.First(); k != nil; k, v = curser.Next() {
+
+		// Check if all deployments in twin are deleted → mark twin as deleted
+		allDeleted := true
+		cursor := twinBucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			if v != nil {
-				// checking that it is a bucket
+				// Not a bucket
 				continue
 			}
 
 			if len(k) != 8 || string(k) == "global" {
-				// sanity check it's a valid uint32
+				// Skip non-deployment buckets
 				continue
 			}
 
-			found = true
-			break
+			dlBucket := twinBucket.Bucket(k)
+			if dlBucket == nil {
+				continue
+			}
+
+			// Check if this deployment is deleted
+			deletedAt := dlBucket.Get([]byte(keyDeletedAt))
+			if deletedAt == nil || b.l64(deletedAt) == 0 {
+				// Found non-deleted deployment
+				allDeleted = false
+				break
+			}
 		}
 
-		if !found {
-			// empty bucket
-			return t.DeleteBucket(b.u32(twin))
+		if allDeleted {
+			// Mark twin as deleted
+			twinMeta, err := twinBucket.CreateBucketIfNotExists([]byte(keyTwinMetadata))
+			if err != nil {
+				return errors.Wrap(err, "failed to create twin metadata bucket")
+			}
+			if err := twinMeta.Put([]byte(keyDeletedAt), now); err != nil {
+				return err
+			}
 		}
 
 		return nil
 	})
 }
 
-func (b *BoltStorage) Get(twin uint32, deployment uint64) (dl gridtypes.Deployment, err error) {
+func (b *BoltStorage) Get(twin uint32, deployment uint64, opts ...provision.QueryOpt) (dl gridtypes.Deployment, err error) {
+	opts_ := &provision.QueryOpts{}
+	for _, opt := range opts {
+		opt(opts_)
+	}
+
 	dl.TwinID = twin
 	dl.ContractID = deployment
 	err = b.db.View(func(t *bolt.Tx) error {
@@ -230,6 +259,12 @@ func (b *BoltStorage) Get(twin uint32, deployment uint64) (dl gridtypes.Deployme
 		if deployment == nil {
 			return errors.Wrap(provision.ErrDeploymentNotExists, "deployment not found")
 		}
+
+		// Check if deployment is soft-deleted
+		if !opts_.Deleted && b.isDeploymentBucketDeleted(deployment) {
+			return errors.Wrap(provision.ErrDeploymentNotExists, "deployment is deleted")
+		}
+
 		if value := deployment.Get([]byte(keyVersion)); value != nil {
 			dl.Version = b.l32(value)
 		}
@@ -251,7 +286,7 @@ func (b *BoltStorage) Get(twin uint32, deployment uint64) (dl gridtypes.Deployme
 		return dl, err
 	}
 
-	dl.Workloads, err = b.workloads(twin, deployment)
+	dl.Workloads, err = b.workloads(twin, deployment, opts_)
 	return
 }
 
@@ -319,7 +354,11 @@ func (b *BoltStorage) add(tx *bolt.Tx, twinID uint32, dl uint64, workload gridty
 	}
 
 	if value := workloads.Get([]byte(workload.Name)); value != nil {
-		return errors.Wrap(provision.ErrWorkloadExists, "workload with same name already exists in deployment")
+		// Check if this is a soft-deleted workload
+		if !isWorkloadDeleted(value) {
+			// Active workload exists - cannot add duplicate
+			return errors.Wrap(provision.ErrWorkloadExists, "workload with same name already exists in deployment")
+		}
 	}
 
 	if err := workloads.Put([]byte(workload.Name), []byte(workload.Type.String())); err != nil {
@@ -342,17 +381,17 @@ func (b *BoltStorage) Add(twin uint32, deployment uint64, workload gridtypes.Wor
 
 func (b *BoltStorage) Remove(twin uint32, deployment uint64, name gridtypes.Name) error {
 	return b.db.Update(func(tx *bolt.Tx) error {
-		twin := tx.Bucket(b.u32(twin))
-		if twin == nil {
+		twinBucket := tx.Bucket(b.u32(twin))
+		if twinBucket == nil {
 			return nil
 		}
 
-		deployment := twin.Bucket(b.u64(deployment))
-		if deployment == nil {
+		deploymentBucket := twinBucket.Bucket(b.u64(deployment))
+		if deploymentBucket == nil {
 			return nil
 		}
 
-		workloads := deployment.Bucket([]byte(keyWorkloads))
+		workloads := deploymentBucket.Bucket([]byte(keyWorkloads))
 		if workloads == nil {
 			return nil
 		}
@@ -362,15 +401,19 @@ func (b *BoltStorage) Remove(twin uint32, deployment uint64, name gridtypes.Name
 			return nil
 		}
 
+		// Clean up global bucket for sharable types
 		if gridtypes.IsSharable(gridtypes.WorkloadType(typ)) {
-			if shared := twin.Bucket([]byte(keyGlobal)); shared != nil {
+			if shared := twinBucket.Bucket([]byte(keyGlobal)); shared != nil {
 				if err := shared.Delete([]byte(name)); err != nil {
 					return err
 				}
 			}
 		}
 
-		return workloads.Delete([]byte(name))
+		// Soft-delete: Mark workload as deleted with timestamp
+		// Format: "type|deleted_at_unix_timestamp"
+		deletedValue := fmt.Sprintf("%s|%d", typ, gridtypes.Now())
+		return workloads.Put([]byte(name), []byte(deletedValue))
 	})
 }
 
@@ -467,7 +510,7 @@ func (b *BoltStorage) Changes(twin uint32, deployment uint64) (changes []gridtyp
 	return
 }
 
-func (b *BoltStorage) workloads(twin uint32, deployment uint64) ([]gridtypes.Workload, error) {
+func (b *BoltStorage) workloads(twin uint32, deployment uint64, opts *provision.QueryOpts) ([]gridtypes.Workload, error) {
 	names := make(map[gridtypes.Name]gridtypes.WorkloadType)
 	workloads := make(map[gridtypes.Name]gridtypes.Workload)
 
@@ -488,7 +531,12 @@ func (b *BoltStorage) workloads(twin uint32, deployment uint64) ([]gridtypes.Wor
 		}
 
 		err := types.ForEach(func(k, v []byte) error {
-			names[gridtypes.Name(k)] = gridtypes.WorkloadType(v)
+			typ, deleted := parseWorkloadType(v)
+			if deleted && !opts.Deleted {
+				return nil
+			}
+
+			names[gridtypes.Name(k)] = typ
 			return nil
 		})
 
@@ -561,7 +609,12 @@ func (b *BoltStorage) workloads(twin uint32, deployment uint64) ([]gridtypes.Wor
 	return result, err
 }
 
-func (b *BoltStorage) Current(twin uint32, deployment uint64, name gridtypes.Name) (gridtypes.Workload, error) {
+func (b *BoltStorage) Current(twin uint32, deployment uint64, name gridtypes.Name, opts ...provision.QueryOpt) (gridtypes.Workload, error) {
+	opts_ := &provision.QueryOpts{}
+	for _, opt := range opts {
+		opt(opts_)
+	}
+
 	var workload gridtypes.Workload
 	err := b.db.View(func(tx *bolt.Tx) error {
 		twin := tx.Bucket(b.u32(twin))
@@ -586,7 +639,10 @@ func (b *BoltStorage) Current(twin uint32, deployment uint64, name gridtypes.Nam
 			return errors.Wrap(provision.ErrWorkloadNotExist, "workload does not exist")
 		}
 
-		typ := gridtypes.WorkloadType(typRaw)
+		typ, deleted := parseWorkloadType(typRaw)
+		if deleted && !opts_.Deleted {
+			return errors.Wrap(provision.ErrWorkloadNotExist, "workload is deleted")
+		}
 
 		logs := deployment.Bucket([]byte(keyTransactions))
 		if logs == nil {
@@ -627,11 +683,16 @@ func (b *BoltStorage) Current(twin uint32, deployment uint64, name gridtypes.Nam
 	return workload, err
 }
 
-func (b *BoltStorage) Twins() ([]uint32, error) {
+func (b *BoltStorage) Twins(opts ...provision.QueryOpt) ([]uint32, error) {
+	opts_ := &provision.QueryOpts{}
+	for _, opt := range opts {
+		opt(opts_)
+	}
+
 	var twins []uint32
 	err := b.db.View(func(t *bolt.Tx) error {
-		curser := t.Cursor()
-		for k, v := curser.First(); k != nil; k, v = curser.Next() {
+		cursor := t.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			if v != nil {
 				// checking that it is a bucket
 				continue
@@ -639,6 +700,15 @@ func (b *BoltStorage) Twins() ([]uint32, error) {
 
 			if len(k) != 4 {
 				// sanity check it's a valid uint32
+				continue
+			}
+
+			twinBucket := t.Bucket(k)
+			if twinBucket == nil {
+				continue
+			}
+
+			if !opts_.Deleted && b.isTwinBucketDeleted(twinBucket) {
 				continue
 			}
 
@@ -651,7 +721,12 @@ func (b *BoltStorage) Twins() ([]uint32, error) {
 	return twins, err
 }
 
-func (b *BoltStorage) ByTwin(twin uint32) ([]uint64, error) {
+func (b *BoltStorage) ByTwin(twin uint32, opts ...provision.QueryOpt) ([]uint64, error) {
+	opts_ := &provision.QueryOpts{}
+	for _, opt := range opts {
+		opt(opts_)
+	}
+
 	var deployments []uint64
 	err := b.db.View(func(t *bolt.Tx) error {
 		bucket := t.Bucket(b.u32(twin))
@@ -659,15 +734,24 @@ func (b *BoltStorage) ByTwin(twin uint32) ([]uint64, error) {
 			return nil
 		}
 
-		curser := bucket.Cursor()
-		for k, v := curser.First(); k != nil; k, v = curser.Next() {
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			if v != nil {
 				// checking that it is a bucket
 				continue
 			}
 
-			if len(k) != 8 || string(k) == "global" {
-				// sanity check it's a valid uint32
+			if len(k) != 8 || string(k) == "global" || string(k) == keyTwinMetadata {
+				// sanity check it's a valid deployment bucket
+				continue
+			}
+
+			deploymentBucket := bucket.Bucket(k)
+			if deploymentBucket == nil {
+				continue
+			}
+
+			if !opts_.Deleted && b.isDeploymentBucketDeleted(deploymentBucket) {
 				continue
 			}
 
@@ -731,53 +815,71 @@ func (b *BoltStorage) Capacity(exclude ...provision.Exclude) (storageCap provisi
 	return storageCap, nil
 }
 
-func (b *BoltStorage) Close() error {
-	return b.db.Close()
-}
+// CleanDeleted hard-deletes items that were soft-deleted before the given timestamp.
+// This purges old deleted items from the database to reclaim space.
+func (b *BoltStorage) CleanDeleted(before gridtypes.Timestamp) error {
+	beforeUnix := uint64(before)
 
-// CleanDeleted is a cleaner method intended to clean up old "deleted" contracts
-// that has no active workloads anymore. We used to always leave the entire history
-// of all deployments that ever lived on the system. But we changed that so once
-// a deployment is deleted, it's deleted forever. Hence this code is only needed
-// temporary until it's available on all environments then can be dropped.
-func (b *BoltStorage) CleanDeleted() error {
-	twins, err := b.Twins()
-	if err != nil {
-		return err
-	}
+	return b.db.Update(func(tx *bolt.Tx) error {
+		cursor := tx.Cursor()
 
-	for _, twin := range twins {
-		dls, err := b.ByTwin(twin)
-		if err != nil {
-			log.Error().Err(err).Uint32("twin", twin).Msg("failed to get twin deployments")
-			continue
-		}
-		for _, dl := range dls {
-			deployment, err := b.Get(twin, dl)
-			if err != nil {
-				log.Error().Err(err).Uint32("twin", twin).Uint64("deployment", dl).Msg("failed to get deployment")
+		// Iterate all twins
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			if v != nil {
+				continue
+			}
+			if len(k) != 4 {
 				continue
 			}
 
-			isActive := false
-			for _, wl := range deployment.Workloads {
-				if !wl.Result.State.IsOkay() {
+			twinBucket := tx.Bucket(k)
+			if twinBucket == nil {
+				continue
+			}
+
+			// Iterate all deployments in this twin
+			dlCursor := twinBucket.Cursor()
+			for dlKey, dlVal := dlCursor.First(); dlKey != nil; dlKey, dlVal = dlCursor.Next() {
+				if dlVal != nil {
+					continue
+				}
+				if len(dlKey) != 8 || string(dlKey) == "global" || string(dlKey) == keyTwinMetadata {
 					continue
 				}
 
-				isActive = true
-				break
+				deploymentBucket := twinBucket.Bucket(dlKey)
+				if deploymentBucket == nil {
+					continue
+				}
+
+				// Check if deployment is deleted and old enough
+				if b.isDeploymentBucketDeleted(deploymentBucket) {
+					deletedAt := deploymentBucket.Get([]byte(keyDeletedAt))
+					if deletedAt != nil && b.l64(deletedAt) < beforeUnix {
+						// Hard delete this deployment bucket
+						deploymentID := b.l64(dlKey)
+						twinID := b.l32(k)
+						if err := twinBucket.DeleteBucket(dlKey); err != nil {
+							log.Error().Err(err).Uint32("twin", twinID).Uint64("deployment", deploymentID).
+								Msg("failed to hard delete deployment")
+						}
+						continue
+					}
+				}
+
+				// Clean up deleted workloads within this deployment
+				workloadsBucket := deploymentBucket.Bucket([]byte(keyWorkloads))
+				b.cleanWorkloads(workloadsBucket, beforeUnix)
 			}
 
-			if isActive {
-				continue
-			}
-
-			if err := b.Delete(twin, dl); err != nil {
-				log.Error().Err(err).Uint32("twin", twin).Uint64("deployment", dl).Msg("failed to delete deployment")
-			}
+			// Check if twin is deleted and old enough
+			b.cleanTwin(tx, k, twinBucket, beforeUnix)
 		}
-	}
 
-	return nil
+		return nil
+	})
+}
+
+func (b *BoltStorage) Close() error {
+	return b.db.Close()
 }

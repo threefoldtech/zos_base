@@ -176,3 +176,72 @@ func (s *ProvisionStub) ListTwins(ctx context.Context) (ret0 []uint32, ret1 erro
 	}
 	return
 }
+
+func (s *ProvisionStub) GetDeployment(ctx context.Context, arg0 uint32, arg1 uint64) (ret0 gridtypes.Deployment, ret1 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "GetDeployment", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret1 = result.CallError()
+	loader := zbus.Loader{
+		&ret0,
+	}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *ProvisionStub) GetDeployments(ctx context.Context, arg0 uint32) (ret0 []gridtypes.Deployment, ret1 error) {
+	args := []interface{}{arg0}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "GetDeployments", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret1 = result.CallError()
+	loader := zbus.Loader{
+		&ret0,
+	}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *ProvisionStub) GetTwins(ctx context.Context) (ret0 []uint32, ret1 error) {
+	args := []interface{}{}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "GetTwins", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret1 = result.CallError()
+	loader := zbus.Loader{
+		&ret0,
+	}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *ProvisionStub) GetWorkload(ctx context.Context, arg0 uint32, arg1 uint64, arg2 gridtypes.Name) (ret0 gridtypes.Workload, ret1 bool, ret2 error) {
+	args := []interface{}{arg0, arg1, arg2}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "GetWorkload", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret2 = result.CallError()
+	loader := zbus.Loader{
+		&ret0,
+		&ret1,
+	}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}

@@ -41,20 +41,11 @@ func Info(ctx context.Context, deps Deps, req InfoRequest) (InfoResponse, error)
 		return InfoResponse{}, err
 	}
 
-	deployment, err := deps.Provision.Get(ctx, twinID, contractID)
+	workload, found, err := deps.Storage.GetWorkload(ctx, twinID, contractID, gridtypes.Name(req.Workload))
 	if err != nil {
-		return InfoResponse{}, fmt.Errorf("failed to get deployment: %w", err)
+		return InfoResponse{}, fmt.Errorf("failed to get workload: %w", err)
 	}
-
-	var workload *gridtypes.Workload
-	for i := range deployment.Workloads {
-		if string(deployment.Workloads[i].Name) == req.Workload {
-			workload = &deployment.Workloads[i]
-			break
-		}
-	}
-
-	if workload == nil {
+	if !found {
 		return InfoResponse{}, fmt.Errorf("workload '%s' not found in deployment", req.Workload)
 	}
 
@@ -70,7 +61,7 @@ func Info(ctx context.Context, deps Deps, req InfoRequest) (InfoResponse, error)
 	case zos.ZMachineType, zos.ZMachineLightType:
 		return handleZMachineInfo(ctx, deps, workloadID.String(), req.Verbose, resp)
 	case zos.NetworkType, zos.NetworkLightType:
-		return handleNetworkInfo(ctx, deps, twinID, workload, resp)
+		return handleNetworkInfo(ctx, deps, twinID, &workload, resp)
 	default:
 		return InfoResponse{}, fmt.Errorf("workload type '%s' not supported for info command", workload.Type)
 	}

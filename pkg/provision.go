@@ -21,6 +21,15 @@ type Provision interface {
 	ListTwins() ([]uint32, error)
 	ListPublicIPs() ([]string, error)
 	ListPrivateIPs(twin uint32, network gridtypes.Name) ([]string, error)
+	// GetDeployment returns a deployment including soft-deleted ones.
+	GetDeployment(twin uint32, contractID uint64) (gridtypes.Deployment, error)
+	// GetDeployments returns all deployments for a twin including soft-deleted ones.
+	GetDeployments(twin uint32) ([]gridtypes.Deployment, error)
+	// GetTwins returns all twins including soft-deleted ones.
+	GetTwins() ([]uint32, error)
+	// GetWorkload returns the latest workload state by name including soft-deleted ones.
+	// Returns (workload, true, nil) if found, (zero, false, nil) if not found.
+	GetWorkload(twin uint32, contractID uint64, name gridtypes.Name) (gridtypes.Workload, bool, error)
 }
 
 type Statistics interface {

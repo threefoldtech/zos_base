@@ -69,7 +69,7 @@ func Health(ctx context.Context, deps Deps, req HealthRequest) (HealthResponse, 
 	}
 
 	if req.Deployment != "" {
-		deployment, err := deps.Provision.Get(ctx, twinID, contractID)
+		deployment, err := deps.Storage.GetDeployment(ctx, twinID, contractID)
 		if err != nil {
 			return HealthResponse{}, fmt.Errorf("failed to get deployment: %w", err)
 		}

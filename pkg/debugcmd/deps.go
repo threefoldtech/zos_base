@@ -11,12 +11,13 @@ import (
 	"github.com/threefoldtech/zos_base/pkg/gridtypes/zos"
 )
 
-// Provision is the subset of the provision zbus interface used by debug commands.
-type Provision interface {
-	ListTwins(ctx context.Context) ([]uint32, error)
-	List(ctx context.Context, twin uint32) ([]gridtypes.Deployment, error)
-	Get(ctx context.Context, twin uint32, contract uint64) (gridtypes.Deployment, error)
-	Changes(ctx context.Context, twin uint32, contract uint64) ([]gridtypes.Workload, error)
+// Storage is the subset of the provision interface used by debug commands.
+type Storage interface {
+	GetDeployment(ctx context.Context, twin uint32, contractID uint64) (gridtypes.Deployment, error)
+	GetDeployments(ctx context.Context, twin uint32) ([]gridtypes.Deployment, error)
+	GetTwins(ctx context.Context) ([]uint32, error)
+	Changes(ctx context.Context, twin uint32, contractID uint64) ([]gridtypes.Workload, error)
+	GetWorkload(ctx context.Context, twin uint32, contractID uint64, name gridtypes.Name) (gridtypes.Workload, bool, error)
 }
 
 // VM is the subset of the vmd zbus interface used by debug commands.
@@ -33,9 +34,9 @@ type Network interface {
 }
 
 type Deps struct {
-	Provision Provision
-	VM        VM
-	Network   Network
+	VM      VM
+	Network Network
+	Storage Storage
 }
 
 // ParseDeploymentID parses a deployment identifier in the format "twin-id:contract-id"

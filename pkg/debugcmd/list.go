@@ -40,19 +40,16 @@ func ParseListRequest(payload []byte) (ListRequest, error) {
 func List(ctx context.Context, deps Deps, req ListRequest) (ListResponse, error) {
 	twins := []uint32{req.TwinID}
 	if req.TwinID == 0 {
-		allTwins, err := deps.Provision.ListTwins(ctx)
+		var err error
+		twins, err = deps.Storage.GetTwins(ctx)
 		if err != nil {
 			return ListResponse{}, err
 		}
-
-		twins = allTwins
 	}
 
 	deployments := make([]ListDeployment, 0)
 	for _, twin := range twins {
-		// TODO: this is only returning active deployments,
-		// cause when deprovision the workload is removed from the key list.
-		deploymentList, err := deps.Provision.List(ctx, twin)
+		deploymentList, err := deps.Storage.GetDeployments(ctx, twin)
 		if err != nil {
 			return ListResponse{}, err
 		}

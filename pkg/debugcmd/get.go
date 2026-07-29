@@ -29,8 +29,7 @@ func Get(ctx context.Context, deps Deps, req GetRequest) (GetResponse, error) {
 		return GetResponse{}, err
 	}
 
-	// TODO: only return active deployment. should return all
-	deployment, err := deps.Provision.Get(ctx, twinID, contractID)
+	deployment, err := deps.Storage.GetDeployment(ctx, twinID, contractID)
 	if err != nil {
 		return GetResponse{}, err
 	}
