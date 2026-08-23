@@ -20,3 +20,8 @@ qemu/*.efi
 
 # c object
 *.o
+
+# session + migration dev cruft
+.claude/
+scripts/migration.bak/
+scripts/migration/zosmigration

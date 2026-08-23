@@ -161,6 +161,21 @@ func (s *StorageModuleStub) DiskDelete(ctx context.Context, arg0 string) (ret0 e
 	return
 }
 
+func (s *StorageModuleStub) DiskDownload(ctx context.Context, arg0 string, arg1 string) (ret0 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "DiskDownload", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
 func (s *StorageModuleStub) DiskExists(ctx context.Context, arg0 string) (ret0 bool) {
 	args := []interface{}{arg0}
 	result, err := s.client.RequestContext(ctx, s.module, s.object, "DiskExists", args...)
@@ -237,6 +252,21 @@ func (s *StorageModuleStub) DiskResize(ctx context.Context, arg0 string, arg1 gr
 	loader := zbus.Loader{
 		&ret0,
 	}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *StorageModuleStub) DiskUpload(ctx context.Context, arg0 string, arg1 string) (ret0 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "DiskUpload", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
 	if err := result.Unmarshal(&loader); err != nil {
 		panic(err)
 	}
@@ -348,6 +378,21 @@ func (s *StorageModuleStub) VolumeDelete(ctx context.Context, arg0 string) (ret0
 	return
 }
 
+func (s *StorageModuleStub) VolumeDownload(ctx context.Context, arg0 string, arg1 gridtypes.Unit, arg2 string) (ret0 error) {
+	args := []interface{}{arg0, arg1, arg2}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "VolumeDownload", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
 func (s *StorageModuleStub) VolumeExists(ctx context.Context, arg0 string) (ret0 bool, ret1 error) {
 	args := []interface{}{arg0}
 	result, err := s.client.RequestContext(ctx, s.module, s.object, "VolumeExists", args...)
@@ -402,6 +447,21 @@ func (s *StorageModuleStub) VolumeLookup(ctx context.Context, arg0 string) (ret0
 func (s *StorageModuleStub) VolumeUpdate(ctx context.Context, arg0 string, arg1 gridtypes.Unit) (ret0 error) {
 	args := []interface{}{arg0, arg1}
 	result, err := s.client.RequestContext(ctx, s.module, s.object, "VolumeUpdate", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *StorageModuleStub) VolumeUpload(ctx context.Context, arg0 string, arg1 string) (ret0 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "VolumeUpload", args...)
 	if err != nil {
 		panic(err)
 	}

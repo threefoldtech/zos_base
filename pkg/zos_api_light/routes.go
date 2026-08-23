@@ -42,6 +42,9 @@ func (g *ZosAPI) SetupRoutes(router *peer.Router) {
 	deployment.WithHandler("get", g.deploymentGetHandler)
 	deployment.WithHandler("list", g.deploymentListHandler)
 	deployment.WithHandler("changes", g.deploymentChangesHandler)
+	deployment.WithHandler("transfer", g.deploymentTransferHandler)
+	deployment.WithHandler("prepare", g.deploymentPrepareHandler)
+	deployment.WithHandler("start", g.deploymentStartHandler)
 
 	admin := root.SubRoute("admin")
 	admin.Use(g.authorized)

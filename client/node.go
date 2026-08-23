@@ -107,6 +107,56 @@ func (n *NodeClient) DeploymentDelete(ctx context.Context, contractID uint64) er
 	return n.bus.Call(ctx, n.nodeTwin, cmd, in, nil)
 }
 
+// TransferItem maps a workload (a zmount or a zmachine, by name) to a presigned
+// S3 URL used to move its bytes between nodes.
+type TransferItem struct {
+	WorkloadName gridtypes.Name `json:"workload_name"`
+	URL          string         `json:"url"`
+	// Size is the volume size to (re)create on the target for a rootfs volume
+	// download; ignored for uploads and for zmount downloads.
+	Size gridtypes.Unit `json:"size,omitempty"`
+}
+
+// DeploymentTransfer asks the (old) node to upload the persistent bytes of the
+// given contract's workloads (zmount disks and/or the VM rootfs writable layer)
+// to the provided presigned S3 URLs. The node pauses the deployment first for a
+// consistent copy.
+func (n *NodeClient) DeploymentTransfer(ctx context.Context, contractID uint64, uploads []TransferItem) error {
+	const cmd = "zos.deployment.transfer"
+	in := args{
+		"contract_id": contractID,
+		"uploads":     uploads,
+	}
+
+	return n.bus.Call(ctx, n.nodeTwin, cmd, in, nil)
+}
+
+// DeploymentPrepare asks the (new) node to stage the deployment without starting
+// the zmachine (provision network + zmount(s)) and to pull each listed workload's
+// bytes from the provided presigned S3 URLs into the new zmount disk / rootfs
+// volume. The VM is started by a follow-up call once data is in place.
+func (n *NodeClient) DeploymentPrepare(ctx context.Context, dl gridtypes.Deployment, downloads []TransferItem, start bool) error {
+	const cmd = "zos.deployment.prepare"
+	in := args{
+		"deployment": dl,
+		"downloads":  downloads,
+		"start":      start,
+	}
+
+	return n.bus.Call(ctx, n.nodeTwin, cmd, in, nil)
+}
+
+// DeploymentStart boots the zmachine(s) of a deployment previously staged on the
+// (new) node via DeploymentPrepare, completing a contract move.
+func (n *NodeClient) DeploymentStart(ctx context.Context, contractID uint64) error {
+	const cmd = "zos.deployment.start"
+	in := args{
+		"contract_id": contractID,
+	}
+
+	return n.bus.Call(ctx, n.nodeTwin, cmd, in, nil)
+}
+
 // Counters (statistics) of the node
 type Counters struct {
 	// Total system capacity

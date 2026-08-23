@@ -18,8 +18,12 @@ type Engine interface {
 	// means that workload has been committed to storage (accepts)
 	// and will be processes later
 	Provision(ctx context.Context, wl gridtypes.Deployment) error
+	// Prepare provisions every workload except the zmachine (leaves the VM unbooted)
+	Prepare(ctx context.Context, wl gridtypes.Deployment) error
 	Deprovision(ctx context.Context, twin uint32, id uint64, reason string) error
 	Pause(ctx context.Context, twin uint32, id uint64) error
+	// Start boots the zmachine(s) of a previously prepared deployment
+	Start(ctx context.Context, twin uint32, id uint64) error
 	Resume(ctx context.Context, twin uint32, id uint64) error
 	Update(ctx context.Context, update gridtypes.Deployment) error
 	Storage() Storage
