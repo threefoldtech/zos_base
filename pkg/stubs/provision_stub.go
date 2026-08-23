@@ -176,3 +176,48 @@ func (s *ProvisionStub) ListTwins(ctx context.Context) (ret0 []uint32, ret1 erro
 	}
 	return
 }
+
+func (s *ProvisionStub) PauseDeployment(ctx context.Context, arg0 uint32, arg1 uint64) (ret0 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "PauseDeployment", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *ProvisionStub) PrepareDeployment(ctx context.Context, arg0 uint32, arg1 gridtypes.Deployment) (ret0 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "PrepareDeployment", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
+func (s *ProvisionStub) StartDeployment(ctx context.Context, arg0 uint32, arg1 uint64) (ret0 error) {
+	args := []interface{}{arg0, arg1}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "StartDeployment", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	ret0 = result.CallError()
+	loader := zbus.Loader{}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}

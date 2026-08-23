@@ -146,6 +146,21 @@ type StorageModule interface {
 	DiskDelete(name string) error
 
 	DiskList() ([]VDisk, error)
+
+	// Migration transfer (deployment move between nodes)
+
+	// DiskUpload streams the raw vdisk `id` to the presigned URL via HTTP PUT
+	DiskUpload(id string, url string) error
+
+	// DiskDownload downloads from the presigned URL into the existing vdisk `id`
+	DiskDownload(id string, url string) error
+
+	// VolumeUpload tars the subvolume `name` and streams it to the presigned URL via HTTP PUT
+	VolumeUpload(name string, url string) error
+
+	// VolumeDownload ensures a subvolume `name` of `size` exists then extracts the tar from url into it
+	VolumeDownload(name string, size gridtypes.Unit, url string) error
+
 	// Device management
 
 	//Devices list all "allocated" devices

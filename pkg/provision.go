@@ -15,6 +15,12 @@ type Provision interface {
 	// GetWorkloadStatus: returns status, bool(true if workload exits otherwise it is false), error
 	GetWorkloadStatus(id string) (gridtypes.ResultState, bool, error)
 	CreateOrUpdate(twin uint32, deployment gridtypes.Deployment, update bool) error
+	// PrepareDeployment stages a deployment (provisions all but the zmachine) for a contract move
+	PrepareDeployment(twin uint32, deployment gridtypes.Deployment) error
+	// PauseDeployment pauses a deployment (used to freeze a source VM before transferring its data)
+	PauseDeployment(twin uint32, id uint64) error
+	// StartDeployment boots the zmachine(s) of a deployment previously staged via PrepareDeployment
+	StartDeployment(twin uint32, id uint64) error
 	Get(twin uint32, contractID uint64) (gridtypes.Deployment, error)
 	List(twin uint32) ([]gridtypes.Deployment, error)
 	Changes(twin uint32, contractID uint64) ([]gridtypes.Workload, error)

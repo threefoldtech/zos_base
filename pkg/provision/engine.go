@@ -92,6 +92,14 @@ const (
 	opPause
 	// opResume resumes a deployment
 	opResume
+	// opPrepare provisions all workloads of a deployment EXCEPT the zmachine
+	// types, leaving the VM unbooted. Used to stage a deployment on a target
+	// node during a contract move (network + zmount + rootfs volume are created
+	// so their data can be pulled in before the VM is started).
+	opPrepare
+	// opStart installs ONLY the zmachine workloads of a previously prepared
+	// deployment, booting the VM after its data has been pulled in.
+	opStart
 	// servers default timeout
 	defaultHttpTimeout = 10 * time.Second
 )
@@ -368,6 +376,33 @@ func (e *NativeEngine) Provision(ctx context.Context, deployment gridtypes.Deplo
 	return e.queue.Enqueue(&job)
 }
 
+// Prepare stages a deployment on this node: it persists the whole deployment
+// (so the zmachine is stored and can be started later) and provisions every
+// workload EXCEPT the zmachine types, leaving the VM unbooted. This is used
+// during a contract move so the target node can create the network, zmount(s)
+// and rootfs volume and pull their data before starting the VM.
+func (e *NativeEngine) Prepare(ctx context.Context, deployment gridtypes.Deployment) error {
+	log.Info().
+		Uint32("twin", deployment.TwinID).
+		Uint64("contract", deployment.ContractID).
+		Msg("scheduling deployment for prepare")
+
+	if deployment.Version != 0 {
+		return errors.Wrap(ErrInvalidVersion, "expected version to be 0 on deployment creation")
+	}
+
+	if err := e.storage.Create(deployment); err != nil {
+		return err
+	}
+
+	job := engineJob{
+		Target: deployment,
+		Op:     opPrepare,
+	}
+
+	return e.queue.Enqueue(&job)
+}
+
 // Pause deployment
 func (e *NativeEngine) Pause(ctx context.Context, twin uint32, id uint64) error {
 	deployment, err := e.storage.Get(twin, id)
@@ -403,6 +438,28 @@ func (e *NativeEngine) Resume(ctx context.Context, twin uint32, id uint64) error
 	job := engineJob{
 		Target: deployment,
 		Op:     opResume,
+	}
+
+	return e.queue.Enqueue(&job)
+}
+
+// Start boots the zmachine(s) of a previously prepared deployment (see opPrepare).
+// It installs only the zmachine workloads that were skipped during prepare,
+// reusing the network, zmount(s) and rootfs volume already staged on this node.
+func (e *NativeEngine) Start(ctx context.Context, twin uint32, id uint64) error {
+	deployment, err := e.storage.Get(twin, id)
+	if err != nil {
+		return err
+	}
+
+	log.Info().
+		Uint32("twin", deployment.TwinID).
+		Uint64("contract", deployment.ContractID).
+		Msg("schedule for start")
+
+	job := engineJob{
+		Target: deployment,
+		Op:     opStart,
 	}
 
 	return e.queue.Enqueue(&job)
@@ -513,6 +570,7 @@ func (e *NativeEngine) Run(root context.Context) error {
 		// this should ONLY be done on provosion and update operation
 		if job.Op == opProvision ||
 			job.Op == opUpdate ||
+			job.Op == opPrepare ||
 			job.Op == opProvisionNoValidation {
 			// otherwise, contract validation is needed
 			ctx, err = e.validate(ctx, &job.Target, job.Op == opProvisionNoValidation)
@@ -535,6 +593,10 @@ func (e *NativeEngine) Run(root context.Context) error {
 			fallthrough
 		case opProvision:
 			e.installDeployment(ctx, &job.Target)
+		case opPrepare:
+			e.prepareDeployment(ctx, &job.Target)
+		case opStart:
+			e.startDeployment(ctx, &job.Target)
 		case opDeprovision:
 			e.uninstallDeployment(ctx, &job.Target, job.Message)
 		case opPause:
@@ -927,6 +989,46 @@ func (e *NativeEngine) installDeployment(ctx context.Context, getter gridtypes.W
 	}
 }
 
+// prepareDeployment installs every workload of a deployment EXCEPT the zmachine
+// types, leaving the VM unbooted. Same iteration/order as installDeployment.
+func (e *NativeEngine) prepareDeployment(ctx context.Context, getter gridtypes.WorkloadGetter) {
+	for _, typ := range e.order {
+		if typ == zos.ZMachineType || typ == zos.ZMachineLightType {
+			continue
+		}
+
+		workloads := getter.ByType(typ)
+
+		if typ == zos.ZMountType || typ == zos.VolumeType {
+			sortMountWorkloads(workloads)
+		}
+
+		for _, wl := range workloads {
+			if err := e.installWorkload(ctx, wl); err != nil {
+				log.Error().Err(err).Stringer("id", wl.ID).Msg("failed to install workload during prepare")
+			}
+		}
+	}
+}
+
+// startDeployment installs ONLY the zmachine workloads of a deployment. It is the
+// counterpart of prepareDeployment: prepare stages everything except the VM, then
+// start boots the VM once its migrated data is in place. installWorkload reads the
+// stored StateInit record and provisions the VM (the real boot path).
+func (e *NativeEngine) startDeployment(ctx context.Context, getter gridtypes.WorkloadGetter) {
+	for _, typ := range e.order {
+		if typ != zos.ZMachineType && typ != zos.ZMachineLightType {
+			continue
+		}
+
+		for _, wl := range getter.ByType(typ) {
+			if err := e.installWorkload(ctx, wl); err != nil {
+				log.Error().Err(err).Stringer("id", wl.ID).Msg("failed to install workload during start")
+			}
+		}
+	}
+}
+
 func (e *NativeEngine) lockDeployment(ctx context.Context, getter gridtypes.WorkloadGetter) {
 	for i := len(e.order) - 1; i >= 0; i-- {
 		typ := e.order[i]
@@ -1064,6 +1166,56 @@ func (n *NativeEngine) CreateOrUpdate(twin uint32, deployment gridtypes.Deployme
 	}
 
 	return action(ctx, deployment)
+}
+
+// PrepareDeployment is the zbus/RMB-facing entry to stage a deployment on this
+// node during a contract move. It runs the same validation as CreateOrUpdate
+// (ownership, KYC, signatures) then provisions everything except the zmachine
+// via the internal Prepare (see opPrepare). The VM is started later by a
+// separate call once the migrated data has been pulled in.
+func (n *NativeEngine) PrepareDeployment(twin uint32, deployment gridtypes.Deployment) error {
+	if err := deployment.Valid(); err != nil {
+		return err
+	}
+
+	if deployment.TwinID != twin {
+		return fmt.Errorf("twin id mismatch (deployment: %d, message: %d)", deployment.TwinID, twin)
+	}
+
+	check := func() error {
+		if ok, err := isTwinVerified(twin); err != nil {
+			return err
+		} else if !ok {
+			return fmt.Errorf("user with twin id %d is not verified", twin)
+		}
+		return nil
+	}
+
+	if err := backoff.Retry(check, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)); err != nil {
+		return err
+	}
+
+	if err := deployment.Verify(n.twins); err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+
+	return n.Prepare(ctx, deployment)
+}
+
+// PauseDeployment is the zbus/RMB-facing entry to pause a deployment (freezes a
+// source VM so its disks/rootfs can be transferred consistently). It wraps the
+// internal Pause, which scopes to the given twin's storage.
+func (n *NativeEngine) PauseDeployment(twin uint32, id uint64) error {
+	return n.Pause(context.Background(), twin, id)
+}
+
+// StartDeployment is the zbus/RMB-facing entry to boot the zmachine(s) of a
+// deployment previously staged via PrepareDeployment. It wraps the internal Start.
+func (n *NativeEngine) StartDeployment(twin uint32, id uint64) error {
+	return n.Start(context.Background(), twin, id)
 }
 
 func (n *NativeEngine) Get(twin uint32, contractID uint64) (gridtypes.Deployment, error) {
