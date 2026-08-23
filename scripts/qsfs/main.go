@@ -47,9 +47,10 @@ const (
 	QSFSCacheSize      = 1 // GB
 
 	SSHKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDTwULSsUubOq3VPWL6cdrDvexDmjfznGydFPyaNcn7gAL9lRxwFbCDPMj7MbhNSpxxHV2+/iJPQOTVJu4oc1N7bPP3gBCnF51rPrhTpGCt5pBbTzeyNweanhedkKDsCO2mIEh/92Od5Hg512dX4j7Zw6ipRWYSaepapfyoRnNSriW/s3DH/uewezVtL5EuypMdfNngV/u2KZYWoeiwhrY/yEUykQVUwDysW/xUJNP5o+KSTAvNSJatr3FbuCFuCjBSvageOLHePTeUwu6qjqe+Xs4piF1ByO/6cOJ8bt5Vcx0bAtI8/MPApplUU/JWevsPNApvnA/ntffI+u8DCwgP ashraf@thinkpad"
-
-	Mnemonic = "junior sock chunk accident pilot under ask green endless remove coast wood"
 )
+
+// Mnemonic is the owner twin mnemonic — read from the MNEMONIC env var, never hard-coded.
+var Mnemonic = os.Getenv("MNEMONIC")
 
 // generateWGPrivateKey generates a WireGuard (Curve25519) private key
 func generateWGPrivateKey() string {
@@ -342,6 +343,10 @@ func extractZDBResults(dl gridtypes.Deployment, mode zos.ZDBMode) []zos.ZdbBacke
 func main() {
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
+
+	if Mnemonic == "" {
+		panic("set the MNEMONIC env var (owner twin mnemonic)")
+	}
 
 	identity, err := substrate.NewIdentityFromSr25519Phrase(Mnemonic)
 	if err != nil {
