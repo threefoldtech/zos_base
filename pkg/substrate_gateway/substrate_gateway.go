@@ -72,6 +72,37 @@ func (g *substrateGateway) GetZosVersion() (string, error) {
 	return result, err
 }
 
+func (g *substrateGateway) GetCouncilMembers() (result []types.AccountID, serr pkg.SubstrateError) {
+	log.Trace().Str("method", "GetCouncilMembers").Msg("method called")
+
+	err := backoff.Retry(func() error {
+		cl, meta, retryErr := g.sub.GetClient()
+		if retryErr != nil {
+			return retryErr
+		}
+		key, retryErr := types.CreateStorageKey(meta, "Council", "Members")
+		if retryErr != nil {
+			// a metadata/pallet-name problem won't fix itself on retry
+			return backoff.Permanent(retryErr)
+		}
+		var members []types.AccountID
+		ok, retryErr := cl.RPC.State.GetStorageLatest(key, &members)
+		if retryErr != nil {
+			log.Debug().Err(retryErr).Msg("GetCouncilMembers failed, retrying")
+			return retryErr
+		}
+		if !ok {
+			result = nil
+			return nil
+		}
+		result = members
+		return nil
+	}, createBackoff())
+
+	serr = buildSubstrateError(err)
+	return
+}
+
 func (g *substrateGateway) CreateNode(node substrate.Node) (uint32, error) {
 	log.Debug().
 		Str("method", "CreateNode").

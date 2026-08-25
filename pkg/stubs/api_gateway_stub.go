@@ -115,6 +115,23 @@ func (s *SubstrateGatewayStub) GetContractIDByNameRegistration(ctx context.Conte
 	return
 }
 
+func (s *SubstrateGatewayStub) GetCouncilMembers(ctx context.Context) (ret0 []types.AccountID, ret1 pkg.SubstrateError) {
+	args := []interface{}{}
+	result, err := s.client.RequestContext(ctx, s.module, s.object, "GetCouncilMembers", args...)
+	if err != nil {
+		panic(err)
+	}
+	result.PanicOnError()
+	loader := zbus.Loader{
+		&ret0,
+		&ret1,
+	}
+	if err := result.Unmarshal(&loader); err != nil {
+		panic(err)
+	}
+	return
+}
+
 func (s *SubstrateGatewayStub) GetFarm(ctx context.Context, arg0 uint32) (ret0 tfchainclientgo.Farm, ret1 error) {
 	args := []interface{}{arg0}
 	result, err := s.client.RequestContext(ctx, s.module, s.object, "GetFarm", args...)
