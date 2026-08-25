@@ -63,8 +63,22 @@ func (g *ZosAPI) deploymentGetHandler(ctx context.Context, payload []byte) (inte
 		return nil, err
 	}
 
-	return g.provisionStub.Get(ctx, peer.GetTwinID(ctx), args.ContractID)
-
+	// Fast path (unchanged behavior): the caller reads its own deployment — no chain lookup.
+	twin := peer.GetTwinID(ctx)
+	if dl, err := g.provisionStub.Get(ctx, twin, args.ContractID); err == nil {
+		return dl, nil
+	}
+	// Slow path: not the caller's own deployment. Allow an ops/council read of another owner's
+	// deployment (needed to drive a keyless migration) — resolve the owner from the on-chain
+	// contract and authorize the caller as the owner or a council member.
+	owner, oerr := g.ownerOfContract(ctx, args.ContractID)
+	if oerr != nil {
+		return nil, oerr
+	}
+	if aerr := g.authorizeMigration(ctx, owner); aerr != nil {
+		return nil, aerr
+	}
+	return g.provisionStub.Get(ctx, owner, args.ContractID)
 }
 
 func (g *ZosAPI) deploymentListHandler(ctx context.Context, payload []byte) (interface{}, error) {
