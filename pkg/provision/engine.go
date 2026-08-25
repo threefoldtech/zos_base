@@ -1195,9 +1195,12 @@ func (n *NativeEngine) PrepareDeployment(twin uint32, deployment gridtypes.Deplo
 		return err
 	}
 
-	if err := deployment.Verify(n.twins); err != nil {
-		return err
-	}
+	// NOTE: no owner-signature check here (unlike CreateOrUpdate). A migration is authorized by
+	// the CHAIN: n.Prepare -> validate() enforces that the contract names THIS node and that its
+	// on-chain deployment_hash equals this deployment's ChallengeHash. Only the council can point
+	// a contract at a node and set that hash (migrate_node_contract), and the RMB caller was
+	// already authorized as the owner or a council member in the API handler. This lets ops move
+	// a VM without the owner's key — the deployment keeps its original owner twin.
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()

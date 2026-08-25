@@ -16,6 +16,9 @@ type SubstrateGateway interface {
 	EnsureAccount(activationURL []string, termsAndConditionsLink string, termsAndConditionsHash string) (info substrate.AccountInfo, err error)
 	GetContract(id uint64) (substrate.Contract, SubstrateError)
 	GetContractIDByNameRegistration(name string) (uint64, SubstrateError)
+	// GetCouncilMembers returns the account ids of the current council members. Used to
+	// authorize council-driven (ops) deployment migrations without the owner's key.
+	GetCouncilMembers() ([]types.AccountID, SubstrateError)
 	GetFarm(id uint32) (substrate.Farm, error)
 	GetNode(id uint32) (substrate.Node, error)
 	GetNodeByTwinID(twin uint32) (uint32, SubstrateError)
