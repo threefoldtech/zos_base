@@ -1,6 +1,7 @@
 package zosapi
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -64,8 +65,20 @@ func (g *ZosAPI) deploymentGetHandler(ctx context.Context, payload []byte) (inte
 		return nil, err
 	}
 
-	return g.provisionStub.Get(ctx, peer.GetTwinID(ctx), args.ContractID)
-
+	// fast path (unchanged): the caller reads its own deployment — no chain lookup
+	twin := peer.GetTwinID(ctx)
+	if dl, err := g.provisionStub.Get(ctx, twin, args.ContractID); err == nil {
+		return dl, nil
+	}
+	// slow path: allow an ops/council read of another owner's deployment (keyless migration)
+	owner, oerr := g.ownerOfContract(ctx, args.ContractID)
+	if oerr != nil {
+		return nil, oerr
+	}
+	if aerr := g.authorizeMigration(ctx, owner); aerr != nil {
+		return nil, aerr
+	}
+	return g.provisionStub.Get(ctx, owner, args.ContractID)
 }
 
 func (g *ZosAPI) deploymentListHandler(ctx context.Context, payload []byte) (interface{}, error) {
@@ -88,6 +101,41 @@ func (g *ZosAPI) deploymentChangesHandler(ctx context.Context, payload []byte) (
 // source deployment for a consistent copy, then uploads each requested workload
 // to a caller-provided presigned S3 URL (HTTP PUT). Used on the OLD node during
 // a contract move.
+// authorizeMigration authorizes a council-driven (ops) migration op on a deployment owned by
+// ownerTwin: the RMB caller must be the owner or a current council member (council governs the
+// on-chain contract move, so it may also drive the node-side data move). Lets ops migrate a VM
+// without the owner's key.
+func (g *ZosAPI) authorizeMigration(ctx context.Context, ownerTwin uint32) error {
+	caller := peer.GetTwinID(ctx)
+	if caller == ownerTwin {
+		return nil
+	}
+	callerTwin, err := g.substrateGatewayStub.GetTwin(ctx, caller)
+	if err != nil {
+		return fmt.Errorf("failed to resolve caller twin %d: %w", caller, err)
+	}
+	members, serr := g.substrateGatewayStub.GetCouncilMembers(ctx)
+	if serr.IsError() {
+		return fmt.Errorf("failed to fetch council members: %w", serr.Err)
+	}
+	callerPk := callerTwin.Account.PublicKey()
+	for _, m := range members {
+		if bytes.Equal(m[:], callerPk) {
+			return nil
+		}
+	}
+	return fmt.Errorf("caller twin %d is neither the deployment owner (twin %d) nor a council member", caller, ownerTwin)
+}
+
+// ownerOfContract resolves the owner twin of a node contract from chain.
+func (g *ZosAPI) ownerOfContract(ctx context.Context, contractID uint64) (uint32, error) {
+	contract, serr := g.substrateGatewayStub.GetContract(ctx, contractID)
+	if serr.IsError() {
+		return 0, fmt.Errorf("failed to get contract %d: %w", contractID, serr.Err)
+	}
+	return uint32(contract.TwinID), nil
+}
+
 func (g *ZosAPI) deploymentTransferHandler(ctx context.Context, payload []byte) (interface{}, error) {
 	var args struct {
 		ContractID uint64         `json:"contract_id"`
@@ -97,7 +145,15 @@ func (g *ZosAPI) deploymentTransferHandler(ctx context.Context, payload []byte) 
 		return nil, err
 	}
 
-	twin := peer.GetTwinID(ctx)
+	// owner-agnostic: resolve the owner from the contract and authorize the caller as owner or
+	// council; all storage ops below run under the OWNER twin.
+	twin, err := g.ownerOfContract(ctx, args.ContractID)
+	if err != nil {
+		return nil, err
+	}
+	if err := g.authorizeMigration(ctx, twin); err != nil {
+		return nil, err
+	}
 	deployment, err := g.provisionStub.Get(ctx, twin, args.ContractID)
 	if err != nil {
 		return nil, err
@@ -139,7 +195,12 @@ func (g *ZosAPI) deploymentPrepareHandler(ctx context.Context, payload []byte) (
 		return nil, err
 	}
 
-	twin := peer.GetTwinID(ctx)
+	// the deployment carries its owner twin; authorize the caller as owner or council. The
+	// on-chain contract hash (set by the council move) is the authority — see engine.validate.
+	twin := args.Deployment.TwinID
+	if err := g.authorizeMigration(ctx, twin); err != nil {
+		return nil, err
+	}
 
 	// resolve + validate the requested workloads up front (synchronous errors)
 	jobs, err := resolveTransferJobs(&args.Deployment, args.Downloads)
@@ -170,7 +231,14 @@ func (g *ZosAPI) deploymentStartHandler(ctx context.Context, payload []byte) (in
 	if err := json.Unmarshal(payload, &args); err != nil {
 		return nil, err
 	}
-	return nil, g.provisionStub.StartDeployment(ctx, peer.GetTwinID(ctx), args.ContractID)
+	twin, err := g.ownerOfContract(ctx, args.ContractID)
+	if err != nil {
+		return nil, err
+	}
+	if err := g.authorizeMigration(ctx, twin); err != nil {
+		return nil, err
+	}
+	return nil, g.provisionStub.StartDeployment(ctx, twin, args.ContractID)
 }
 
 // waitWorkloadProvisioned blocks until the workload with the given global id

@@ -29,6 +29,7 @@ type ZosAPI struct {
 	statisticsStub         *stubs.StatisticsStub
 	storageStub            *stubs.StorageModuleStub
 	performanceMonitorStub *stubs.PerformanceMonitorStub
+	substrateGatewayStub   *stubs.SubstrateGatewayStub
 	diagnosticsManager     *diagnostics.DiagnosticsManager
 	farmerID               uint32
 	inMemCache             *cache.Cache
@@ -54,6 +55,7 @@ func NewZosAPI(manager substrate.Manager, client zbus.Client, msgBrokerCon strin
 		statisticsStub:         stubs.NewStatisticsStub(client),
 		storageStub:            storageModuleStub,
 		performanceMonitorStub: stubs.NewPerformanceMonitorStub(client),
+		substrateGatewayStub:   stubs.NewSubstrateGatewayStub(client),
 		diagnosticsManager:     diagnosticsManager,
 	}
 	exp := backoff.NewExponentialBackOff()
@@ -109,6 +111,7 @@ func NewZosAPIWithFarmerID(client zbus.Client, farmerID uint32, msgBrokerCon str
 		statisticsStub:         stubs.NewStatisticsStub(client),
 		storageStub:            storageModuleStub,
 		performanceMonitorStub: stubs.NewPerformanceMonitorStub(client),
+		substrateGatewayStub:   stubs.NewSubstrateGatewayStub(client),
 		diagnosticsManager:     diagnosticsManager,
 	}
 	api.farmerID = farmerID
