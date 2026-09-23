@@ -72,25 +72,25 @@ func (k Params) IsLight() bool {
 
 // ISV3Light check if node is running in v3light mode
 func (k Params) IsV3Light() bool {
-	version, found := GetParams().GetOne("version")
+	version, found := k.GetOne("version")
 	return found && version == "v3light"
 }
 
 // getVersion checks if node is running version 4
 func (k Params) GetVersion() string {
-	version, _ := GetParams().GetOne("version")
+	version, _ := k.GetOne("version")
 	return version
 }
 
 // IsV4 checks if node is running version 4
 func (k Params) IsV4() bool {
-	version, found := GetParams().GetOne("version")
+	version, found := k.GetOne("version")
 	return found && version == "v4"
 }
 
 // IsV3 checks if node is running normal version 3
 func (k Params) IsV3() bool {
-	version, found := GetParams().GetOne("version")
+	version, found := k.GetOne("version")
 	return found && version == "v3"
 }
 
