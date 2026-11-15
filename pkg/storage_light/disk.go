@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -19,6 +20,14 @@ import (
 const (
 	// vdiskVolumeName is the name of the volume used to store vdisks
 	vdiskVolumeName = "vdisks"
+
+	// newDiskXattr is set by DiskCreate. zos only formats or writes an image
+	// to a disk that still has it, so an existing disk is never overwritten
+	// (threefoldtech/zos#2710). A missing tag always means "leave it alone".
+	newDiskXattr = "user.zos.new-disk"
+	// zeroCheckSize is how much of the start and the end of a disk must be
+	// zero for a tagged disk to count as unused.
+	zeroCheckSize = 2 * 1024 * 1024
 )
 
 // VDiskPools return a list of all vdisk pools
@@ -106,7 +115,20 @@ func (s *Module) DiskFormat(name string) error {
 		return errors.Wrapf(err, "couldn't find disk with id: %s", name)
 	}
 
-	return s.ensureFS(path)
+	isNew, err := isNewDisk(path)
+	if err != nil {
+		return err
+	}
+	if !isNew {
+		log.Debug().Str("disk", path).Msg("disk is not new. no format")
+		return nil
+	}
+
+	if err := s.ensureFS(path); err != nil {
+		return err
+	}
+
+	return clearNewDisk(path)
 }
 
 // DiskWrite writes image to disk. Disk will not be changed
@@ -117,9 +139,18 @@ func (s *Module) DiskWrite(name string, image string) error {
 		return errors.Wrapf(err, "couldn't find disk with id: %s", name)
 	}
 
-	if !s.isEmptyDisk(path) {
-		log.Debug().Str("disk", path).Msg("disk already has a filesystem. no write")
+	isNew, err := isNewDisk(path)
+	if err != nil {
+		return err
+	}
+	if !isNew {
+		log.Debug().Str("disk", path).Msg("disk is not new. no write")
 		return nil
+	}
+
+	if !s.isEmptyDisk(path) {
+		log.Warn().Str("disk", path).Msg("new disk already has a filesystem. no write")
+		return clearNewDisk(path)
 	}
 
 	source, err := os.Open(image)
@@ -150,7 +181,8 @@ func (s *Module) DiskWrite(name string, image string) error {
 		return errors.Wrap(err, "failed to write disk image")
 	}
 
-	return nil
+	log.Info().Str("disk", path).Str("image", image).Msg("wrote image to disk")
+	return clearNewDisk(path)
 }
 
 // DiskCreate with given size, return path to virtual disk (size in MB)
@@ -186,6 +218,10 @@ func (s *Module) DiskCreate(name string, size gridtypes.Unit) (disk pkg.VDisk, e
 	}
 
 	defer file.Close()
+	if err = syscall.Setxattr(path, newDiskXattr, []byte("1"), 0); err != nil {
+		return disk, errors.Wrap(err, "failed to tag new disk")
+	}
+
 	if err = chattr.SetAttr(file, chattr.FS_NOCOW_FL); err != nil {
 		return disk, err
 	}
@@ -221,6 +257,7 @@ func (s *Module) DiskResize(name string, size gridtypes.Unit) (disk pkg.VDisk, e
 func (s *Module) ensureFS(disk string) error {
 	output, err := exec.Command("mkfs.btrfs", disk).CombinedOutput()
 	if err == nil {
+		log.Info().Str("disk", disk).Msg("formatted disk with btrfs")
 		return nil
 	}
 	exitErr, ok := err.(*exec.ExitError)
@@ -235,6 +272,65 @@ func (s *Module) ensureFS(disk string) error {
 	}
 
 	return errors.Wrapf(err, "unknown btrfs error '%s'", string(output))
+}
+
+// isNewDisk reports whether zos may format or write an image to the disk: it
+// must still carry the tag set by DiskCreate, and its first and last
+// zeroCheckSize bytes must be zero. A tagged disk that has data loses its tag.
+func isNewDisk(path string) (bool, error) {
+	if _, err := syscall.Getxattr(path, newDiskXattr, nil); err == syscall.ENODATA {
+		return false, nil
+	} else if err != nil {
+		return false, errors.Wrapf(err, "failed to read tag of disk '%s'", path)
+	}
+
+	zeroed, err := isZeroed(path)
+	if err != nil {
+		return false, errors.Wrapf(err, "failed to read disk '%s'", path)
+	}
+	if !zeroed {
+		log.Warn().Str("disk", path).Msg("new disk already has data. not touching it")
+		return false, clearNewDisk(path)
+	}
+
+	return true, nil
+}
+
+func clearNewDisk(path string) error {
+	err := syscall.Removexattr(path, newDiskXattr)
+	if err != nil && err != syscall.ENODATA {
+		return errors.Wrapf(err, "failed to clear tag of disk '%s'", path)
+	}
+	return nil
+}
+
+// isZeroed returns true if the first and last zeroCheckSize bytes of the file
+// are all zero.
+func isZeroed(path string) (bool, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return false, err
+	}
+
+	size := min(stat.Size(), zeroCheckSize)
+	buf := make([]byte, size)
+	zero := make([]byte, size)
+	for _, offset := range []int64{0, stat.Size() - size} {
+		if _, err := file.ReadAt(buf, offset); err != nil {
+			return false, err
+		}
+		if !bytes.Equal(buf, zero) {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
 
 // isEmptyDisk return true, if disk file has no partition table or filesystem
