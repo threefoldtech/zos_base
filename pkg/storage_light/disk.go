@@ -221,6 +221,7 @@ func (s *Module) DiskResize(name string, size gridtypes.Unit) (disk pkg.VDisk, e
 func (s *Module) ensureFS(disk string) error {
 	output, err := exec.Command("mkfs.btrfs", disk).CombinedOutput()
 	if err == nil {
+		log.Info().Str("disk", disk).Msg("formatted disk with btrfs")
 		return nil
 	}
 	exitErr, ok := err.(*exec.ExitError)
