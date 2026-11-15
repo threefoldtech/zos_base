@@ -27,6 +27,11 @@ func (s *Module) DiskDownload(id string, url string) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to lookup disk '%s'", id)
 	}
+	// moved data is never a new disk: clear the tag before writing, so a
+	// format racing with the download can't wipe it
+	if err := clearNewDisk(disk.Path); err != nil {
+		return err
+	}
 	log.Info().Str("id", id).Str("path", disk.Path).Msg("downloading disk")
 	return storagetransfer.DownloadToFile(disk.Path, url)
 }

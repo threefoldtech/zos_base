@@ -166,7 +166,7 @@ func (p *Manager) prepContainer(
 		return errors.Wrap(err, "failed to apply startup config from flist")
 	}
 
-	if err := p.vmMounts(ctx, deployment, config.Mounts, !volumeExists, machine); err != nil {
+	if err := p.vmMounts(ctx, deployment, config.Mounts, true, machine); err != nil {
 		return err
 	}
 	if config.Corex {
